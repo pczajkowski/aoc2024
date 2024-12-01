@@ -51,6 +51,27 @@ func part1(lefts, rights []int) int {
 	return distance
 }
 
+func part2(lefts, rights []int) int {
+	onTheLeft := make(map[int]int)
+	for _, left := range lefts {
+		onTheLeft[left] = 0
+	}
+
+	for _, right := range rights {
+		_, ok := onTheLeft[right]
+		if ok {
+			onTheLeft[right]++
+		}
+	}
+
+	var result int
+	for _, left := range lefts {
+		result += left * onTheLeft[left]
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -64,4 +85,5 @@ func main() {
 
 	lefts, rights := readInput(file)
 	fmt.Println("Part1:", part1(lefts, rights))
+	fmt.Println("Part2:", part2(lefts, rights))
 }

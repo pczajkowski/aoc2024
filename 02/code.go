@@ -36,6 +36,37 @@ func readInput(file *os.File) [][]int {
 	return reports
 }
 
+func safe(report []int) bool {
+	var direction int
+	edge := len(report)
+
+	for i := 1; i < edge; i++ {
+		delta := report[i] - report[i-1]
+		if delta == 0 || delta < -3 || delta > 3 {
+			return false
+		}
+
+		if direction == 0 {
+			direction = delta
+		} else if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func part1(reports [][]int) int {
+	var result int
+	for _, report := range reports {
+		if safe(report) {
+			result++
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -48,5 +79,5 @@ func main() {
 	}
 
 	reports := readInput(file)
-	fmt.Println(reports)
+	fmt.Println("Part1:", part1(reports))
 }

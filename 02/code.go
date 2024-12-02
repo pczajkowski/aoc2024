@@ -36,35 +36,35 @@ func readInput(file *os.File) [][]int {
 	return reports
 }
 
-func safe(report []int) (bool, int) {
+func safe(report []int) int {
 	var direction int
 	edge := len(report)
 
 	for i := 1; i < edge; i++ {
 		delta := report[i] - report[i-1]
 		if delta == 0 || delta < -3 || delta > 3 {
-			return false, i
+			return i
 		}
 
 		if direction == 0 {
 			direction = delta
 		} else if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
-			return false, i
+			return i
 		}
 	}
 
-	return true, 0
+	return 0
 }
 
 func checkReports(reports [][]int) (int, int) {
 	var part1, part2 int
 	for _, report := range reports {
-		status, failed := safe(report)
-		if status {
+		bad := safe(report)
+		if bad == 0 {
 			part1++
 		} else {
-			status, failed = safe(append(report[:failed], report[failed+1:]...))
-			if status {
+			bad = safe(append(report[:bad], report[bad+1:]...))
+			if bad == 0 {
 				part2++
 			}
 		}

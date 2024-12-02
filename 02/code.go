@@ -56,33 +56,21 @@ func safe(report []int) (bool, int) {
 	return true, 0
 }
 
-func part1(reports [][]int) int {
-	var result int
-	for _, report := range reports {
-		status, _ := safe(report)
-		if status {
-			result++
-		}
-	}
-
-	return result
-}
-
-func part2(reports [][]int) int {
-	var result int
+func checkReports(reports [][]int) (int, int) {
+	var part1, part2 int
 	for _, report := range reports {
 		status, failed := safe(report)
 		if status {
-			result++
+			part1++
 		} else {
 			status, failed = safe(append(report[:failed], report[failed+1:]...))
 			if status {
-				result++
+				part2++
 			}
 		}
 	}
 
-	return result
+	return part1, part2
 }
 
 func main() {
@@ -97,6 +85,7 @@ func main() {
 	}
 
 	reports := readInput(file)
-	fmt.Println("Part1:", part1(reports))
-	fmt.Println("Part2:", part2(reports))
+	part1, part2 := checkReports(reports)
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part1+part2)
 }

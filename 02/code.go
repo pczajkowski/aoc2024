@@ -36,19 +36,38 @@ func readInput(file *os.File) [][]int {
 	return reports
 }
 
-func safe(report []int) bool {
+func check(a, b int, direction int) (bool, int) {
+	delta := b - a
+	if delta == 0 || delta < -3 || delta > 3 {
+		return false, direction
+	}
+
+	if direction == 0 {
+		direction = delta
+	} else if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
+		return false, direction
+	}
+
+	return true, direction
+}
+
+func safe(report []int, skip bool) bool {
 	var direction int
+	var status bool
 	edge := len(report)
 
 	for i := 1; i < edge; i++ {
-		delta := report[i] - report[i-1]
-		if delta == 0 || delta < -3 || delta > 3 {
-			return false
-		}
+		status, direction = check(report[i], report[i-1], direction)
+		if !status {
+			if skip && i+1 < edge {
+				status, direction = check(report[i+1], report[i-1], direction)
+				if status {
+					i++
+					skip = false
+					continue
+				}
+			}
 
-		if direction == 0 {
-			direction = delta
-		} else if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
 			return false
 		}
 	}
@@ -56,10 +75,10 @@ func safe(report []int) bool {
 	return true
 }
 
-func part1(reports [][]int) int {
+func part(reports [][]int, skip bool) int {
 	var result int
 	for _, report := range reports {
-		if safe(report) {
+		if safe(report, skip) {
 			result++
 		}
 	}
@@ -79,5 +98,6 @@ func main() {
 	}
 
 	reports := readInput(file)
-	fmt.Println("Part1:", part1(reports))
+	fmt.Println("Part1:", part(reports, false))
+	fmt.Println("Part2:", part(reports, true))
 }

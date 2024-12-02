@@ -56,6 +56,12 @@ func safe(report []int) int {
 	return 0
 }
 
+func removeAt(arr []int, index int) []int {
+	ret := make([]int, 0)
+	ret = append(ret, arr[:index]...)
+	return append(ret, arr[index+1:]...)
+}
+
 func checkReports(reports [][]int) (int, int) {
 	var part1, part2 int
 	for _, report := range reports {
@@ -63,7 +69,7 @@ func checkReports(reports [][]int) (int, int) {
 		if bad == 0 {
 			part1++
 		} else {
-			bad = safe(append(report[:bad], report[bad+1:]...))
+			bad = safe(removeAt(report, bad))
 			if bad == 0 {
 				part2++
 			}

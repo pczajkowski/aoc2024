@@ -57,7 +57,6 @@ func part1(muls [][]int) int {
 func part2(lines []string) int {
 	var result int
 	multiply := true
-	re := regexp.MustCompile(`mul\(\d+,\d+\)`)
 
 	for _, line := range lines {
 		var startIndex, endIndex int
@@ -78,16 +77,7 @@ func part2(lines []string) int {
 					continue
 				}
 
-				matches := re.FindAllString(line[startIndex:endIndex], -1)
-				for _, match := range matches {
-					mul := make([]int, 2)
-					n, err := fmt.Sscanf(match, "mul(%d,%d)", &mul[0], &mul[1])
-					if n != 2 || err != nil {
-						log.Fatalf("Bad input: %s", err)
-					}
-
-					result += mul[0] * mul[1]
-				}
+				result += getResults(line[startIndex:endIndex])
 
 				line = line[endIndex:]
 				startIndex = 0

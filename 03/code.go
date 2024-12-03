@@ -34,6 +34,15 @@ func readInput(file *os.File) [][]int {
 	return muls
 }
 
+func part1(muls [][]int) int {
+	var result int
+	for _, mul := range muls {
+		result += mul[0] * mul[1]
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -46,5 +55,5 @@ func main() {
 	}
 
 	muls := readInput(file)
-	fmt.Println(muls)
+	fmt.Println("Part1:", part1(muls))
 }

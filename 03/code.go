@@ -58,11 +58,11 @@ func part2(lines []string) int {
 		for reading {
 			if multiply {
 				index := strings.Index(line, "don't()")
-				multiply = false
 				if index == -1 {
 					endIndex = len(line)
 					reading = false
 				} else {
+					multiply = false
 					endIndex = index
 				}
 

@@ -72,11 +72,6 @@ func part2(lines []string) int {
 					endIndex = index
 				}
 
-				if startIndex > endIndex {
-					startIndex++
-					continue
-				}
-
 				result += getResults(line[startIndex:endIndex])
 
 				line = line[endIndex:]

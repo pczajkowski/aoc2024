@@ -9,9 +9,27 @@ import (
 	"strings"
 )
 
-func readInput(file *os.File) ([][]int, []string) {
+var mulRegex *regexp.Regexp = regexp.MustCompile(`mul\(\d+,\d+\)`)
+
+func getResults(line string) int {
+	var result int
+	matches := mulRegex.FindAllString(line, -1)
+	for _, match := range matches {
+		mul := make([]int, 2)
+		n, err := fmt.Sscanf(match, "mul(%d,%d)", &mul[0], &mul[1])
+		if n != 2 || err != nil {
+			log.Fatalf("Bad input: %s", err)
+		}
+
+		result += mul[0] * mul[1]
+	}
+
+	return result
+}
+
+func readInput(file *os.File) (int, []string) {
 	scanner := bufio.NewScanner(file)
-	var muls [][]int
+	var result int
 	var lines []string
 
 	for scanner.Scan() {
@@ -21,21 +39,10 @@ func readInput(file *os.File) ([][]int, []string) {
 		}
 
 		lines = append(lines, line)
-
-		re := regexp.MustCompile(`mul\(\d+,\d+\)`)
-		matches := re.FindAllString(line, -1)
-		for _, match := range matches {
-			mul := make([]int, 2)
-			n, err := fmt.Sscanf(match, "mul(%d,%d)", &mul[0], &mul[1])
-			if n != 2 || err != nil {
-				log.Fatalf("Bad input: %s", err)
-			}
-
-			muls = append(muls, mul)
-		}
+		result += getResults(line)
 	}
 
-	return muls, lines
+	return result, lines
 }
 
 func part1(muls [][]int) int {
@@ -111,7 +118,7 @@ func main() {
 		log.Fatalf("Failed to open %s!\n", filePath)
 	}
 
-	muls, lines := readInput(file)
-	fmt.Println("Part1:", part1(muls))
+	part1, lines := readInput(file)
+	fmt.Println("Part1:", part1)
 	fmt.Println("Part2:", part2(lines))
 }

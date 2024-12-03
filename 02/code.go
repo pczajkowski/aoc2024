@@ -36,43 +36,54 @@ func readInput(file *os.File) [][]int {
 	return reports
 }
 
-func safe(report []int) int {
-	var direction int
-	edge := len(report)
+func bigger(a, b int) int {
+	if a > b {
+		return a
+	}
 
-	for i := 1; i < edge; i++ {
-		delta := report[i] - report[i-1]
-		if delta == 0 || delta < -3 || delta > 3 {
-			return i
-		}
+	return b
+}
 
-		if direction == 0 {
-			direction = delta
-		} else if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
-			return i
+func check(arr []int, direction int) (bool, bool) {
+	edge := len(arr)
+	lengths := make([]int, edge)
+
+	for k := 0; k < edge; k++ {
+		lengths[k] = 1
+		for i := 0; i < k; i++ {
+			delta := arr[k] - arr[i]
+			if direction < 0 && delta > 0 || direction > 0 && delta < 0 {
+				continue
+			}
+
+			if delta != 0 && delta <= 3 && delta >= -3 {
+				lengths[k] = bigger(lengths[k], lengths[i]+1)
+			}
 		}
 	}
 
-	return 0
-}
-
-func removeAt(arr []int, index int) []int {
-	ret := make([]int, 0)
-	ret = append(ret, arr[:index]...)
-	return append(ret, arr[index+1:]...)
+	return lengths[edge-1] == edge, lengths[edge-1] == edge-1
 }
 
 func checkReports(reports [][]int) (int, int) {
 	var part1, part2 int
 	for _, report := range reports {
-		bad := safe(report)
-		if bad == 0 {
+		direction := report[1] - report[0]
+		one, two := check(report, direction)
+		if one {
 			part1++
-		} else {
-			bad = safe(removeAt(report, bad))
-			if bad == 0 {
-				part2++
-			}
+			continue
+		} else if two {
+			part2++
+			continue
+		}
+
+		one, two = check(report, -direction)
+		if one {
+			part1++
+			continue
+		} else if two {
+			part2++
 		}
 	}
 

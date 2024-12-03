@@ -59,7 +59,7 @@ func part2(lines []string) int {
 	multiply := true
 
 	for _, line := range lines {
-		var startIndex, endIndex int
+		var endIndex int
 		reading := true
 		for reading {
 			if multiply {
@@ -72,17 +72,15 @@ func part2(lines []string) int {
 					endIndex = index
 				}
 
-				result += getResults(line[startIndex:endIndex])
+				result += getResults(line[:endIndex])
 
 				line = line[endIndex:]
-				startIndex = 0
 			} else {
 				index := strings.Index(line, "do()")
 				if index == -1 {
 					reading = false
 				} else {
 					multiply = true
-					startIndex = 0
 					line = line[index:]
 				}
 			}

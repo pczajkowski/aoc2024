@@ -52,20 +52,23 @@ func part2(lines []string) int {
 	multiply := true
 	re := regexp.MustCompile(`mul\(\d+,\d+\)`)
 
-	var startIndex int
 	for _, line := range lines {
-		edge := len(line) - 1
-		endIndex := edge
+		var startIndex, endIndex int
 		reading := true
 		for reading {
 			if multiply {
-				index := strings.Index(line[startIndex:edge], "don't()")
+				index := strings.Index(line, "don't()")
 				multiply = false
 				if index == -1 {
-					endIndex = edge
+					endIndex = len(line)
 					reading = false
 				} else {
 					endIndex = index
+				}
+
+				if startIndex > endIndex {
+					startIndex++
+					continue
 				}
 
 				matches := re.FindAllString(line[startIndex:endIndex], -1)
@@ -78,14 +81,17 @@ func part2(lines []string) int {
 
 					result += mul[0] * mul[1]
 				}
+
+				line = line[endIndex:]
+				startIndex = 0
 			} else {
-				index := strings.Index(line[startIndex:edge], "do()")
+				index := strings.Index(line, "do()")
 				if index == -1 {
-					startIndex = 0
 					reading = false
 				} else {
 					multiply = true
-					startIndex = index
+					startIndex = 0
+					line = line[index:]
 				}
 			}
 		}

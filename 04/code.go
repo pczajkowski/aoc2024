@@ -30,7 +30,6 @@ func countWordOccurrences(matrix [][]byte, word string) int {
 
 	var dfs func(i, j, wordIndex int, wordSoFar string)
 	dfs = func(i, j, wordIndex int, wordSoFar string) {
-		// Base case: we've matched all characters of the word
 		if wordIndex == len(word) {
 			if !found[wordSoFar] {
 				found[wordSoFar] = true
@@ -40,14 +39,12 @@ func countWordOccurrences(matrix [][]byte, word string) int {
 			return
 		}
 
-		// Check if the current position is valid
 		if i < 0 || i >= rows || j < 0 || j >= cols || matrix[i][j] != word[wordIndex] {
 			return
 		}
 
 		wordSoFar = fmt.Sprintf("%s%d_%d%c", wordSoFar, i, j, matrix[i][j])
 
-		// Move to the next character in the word
 		dfs(i+1, j, wordIndex+1, wordSoFar)   // Down
 		dfs(i-1, j, wordIndex+1, wordSoFar)   // Up
 		dfs(i, j+1, wordIndex+1, wordSoFar)   // Right
@@ -58,7 +55,6 @@ func countWordOccurrences(matrix [][]byte, word string) int {
 		dfs(i-1, j+1, wordIndex+1, wordSoFar) // Diagonal up-right
 	}
 
-	// Try each cell as a starting point
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
 			if matrix[i][j] == word[0] {

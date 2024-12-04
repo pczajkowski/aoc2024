@@ -23,46 +23,47 @@ func readInput(file *os.File) [][]byte {
 	return matrix
 }
 
-func countWordOccurrences(matrix [][]byte, word string) int {
-	rows, cols := len(matrix), len(matrix[0])
-	count := 0
-	found := make(map[string]bool)
+var directions [][]int = [][]int{
+	{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1},
+}
 
-	var dfs func(i, j, wordIndex int, wordSoFar string)
-	dfs = func(i, j, wordIndex int, wordSoFar string) {
-		if wordIndex == len(word) {
-			if !found[wordSoFar] {
-				found[wordSoFar] = true
-				count++
-			}
-
-			return
-		}
-
-		if i < 0 || i >= rows || j < 0 || j >= cols || matrix[i][j] != word[wordIndex] {
-			return
-		}
-
-		wordSoFar = fmt.Sprintf("%s%d_%d%c", wordSoFar, i, j, matrix[i][j])
-
-		dfs(i+1, j, wordIndex+1, wordSoFar)   // Down
-		dfs(i-1, j, wordIndex+1, wordSoFar)   // Up
-		dfs(i, j+1, wordIndex+1, wordSoFar)   // Right
-		dfs(i, j-1, wordIndex+1, wordSoFar)   // Left
-		dfs(i+1, j+1, wordIndex+1, wordSoFar) // Diagonal down-right
-		dfs(i-1, j-1, wordIndex+1, wordSoFar) // Diagonal up-left
-		dfs(i+1, j-1, wordIndex+1, wordSoFar) // Diagonal down-left
-		dfs(i-1, j+1, wordIndex+1, wordSoFar) // Diagonal up-right
+func checkPath(i, j int, matrix [][]byte, word string, index int, direction []int, rows, cols int) int {
+	if i < 0 || i >= rows || j < 0 || j >= cols || matrix[i][j] != word[index] {
+		return 0
 	}
+
+	if index == len(word)-1 {
+		return 1
+	}
+
+	i += direction[0]
+	j += direction[1]
+	index++
+
+	return checkPath(i, j, matrix, word, index, direction, rows, cols)
+}
+
+func check(i, j int, matrix [][]byte, word string, rows, cols int) int {
+	var count int
+	for _, direction := range directions {
+		count += checkPath(i, j, matrix, word, 0, direction, rows, cols)
+	}
+
+	return count
+}
+
+func part1(matrix [][]byte, word string) int {
+	var count int
+	rows, cols := len(matrix), len(matrix[0])
 
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
 			if matrix[i][j] == word[0] {
-				dfs(i, j, 0, "")
+				count += check(i, j, matrix, word, rows, cols)
 			}
 		}
 	}
-	fmt.Println(found)
+
 	return count
 }
 
@@ -78,5 +79,5 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println("Part1:", countWordOccurrences(matrix, "XMAS"))
+	fmt.Println("Part1:", part1(matrix, "XMAS"))
 }

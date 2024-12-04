@@ -67,6 +67,42 @@ func part1(matrix [][]byte, word string) int {
 	return count
 }
 
+func isXmas(i, j int, matrix [][]byte, rows, cols int) bool {
+	if i-1 < 0 || i+1 >= rows || j-1 < 0 || j+1 >= cols {
+		return false
+	}
+
+	opposites := [][]int{{i - 1, j - 1}, {i - 1, j + 1}, {i + 1, j - 1}, {i + 1, j + 1}}
+	for _, opposite := range opposites {
+		if matrix[opposite[0]][opposite[1]] != 'M' && matrix[opposite[0]][opposite[1]] != 'S' {
+			return false
+		}
+	}
+
+	if matrix[opposites[0][0]][opposites[0][1]] == matrix[opposites[3][0]][opposites[3][1]] || matrix[opposites[1][0]][opposites[1][1]] == matrix[opposites[2][0]][opposites[2][1]] {
+		return false
+	}
+
+	return true
+}
+
+func part2(matrix [][]byte) int {
+	var count int
+	rows, cols := len(matrix), len(matrix[0])
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if matrix[i][j] == 'A' {
+				if isXmas(i, j, matrix, rows, cols) {
+					count++
+				}
+			}
+		}
+	}
+
+	return count
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -80,4 +116,5 @@ func main() {
 
 	matrix := readInput(file)
 	fmt.Println("Part1:", part1(matrix, "XMAS"))
+	fmt.Println("Part2:", part2(matrix))
 }

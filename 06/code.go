@@ -56,35 +56,7 @@ func readInput(file *os.File) (*Point, [][]byte) {
 	return guard, matrix
 }
 
-func walk(guard *Point, matrix [][]byte, xMax, yMax int, visited map[string]int) {
-	if guard.x < 0 || guard.x > xMax || guard.y < 0 || guard.y > yMax {
-		return
-	}
-
-	if matrix[guard.y][guard.x] == '#' {
-		guard.x -= directions[guard.direction][0]
-		guard.y -= directions[guard.direction][1]
-		guard.direction = (guard.direction + 1) % 4
-	} else {
-		visited[guard.key()]++
-		guard.x += directions[guard.direction][0]
-		guard.y += directions[guard.direction][1]
-	}
-
-	walk(guard, matrix, xMax, yMax, visited)
-}
-
-func part1(guard *Point, matrix [][]byte) map[string]int {
-	xMax := len(matrix[0]) - 1
-	yMax := len(matrix) - 1
-	visited := make(map[string]int)
-
-	newGuard := Point{x: guard.x, y: guard.y}
-	walk(&newGuard, matrix, xMax, yMax, visited)
-	return visited
-}
-
-func walkWithCheck(guard *Point, matrix [][]byte, xMax, yMax int, visited map[string]int) bool {
+func walk(guard *Point, matrix [][]byte, xMax, yMax int, visited map[string]int, check func(int) bool) bool {
 	if guard.x < 0 || guard.x > xMax || guard.y < 0 || guard.y > yMax {
 		return true
 	}
@@ -95,15 +67,27 @@ func walkWithCheck(guard *Point, matrix [][]byte, xMax, yMax int, visited map[st
 		guard.direction = (guard.direction + 1) % 4
 	} else {
 		visited[guard.key()]++
-		if visited[guard.key()] > 4 {
-			return false
+		if check != nil {
+			if check(visited[guard.key()]) {
+				return false
+			}
 		}
 
 		guard.x += directions[guard.direction][0]
 		guard.y += directions[guard.direction][1]
 	}
 
-	return walkWithCheck(guard, matrix, xMax, yMax, visited)
+	return walk(guard, matrix, xMax, yMax, visited, check)
+}
+
+func part1(guard *Point, matrix [][]byte) map[string]int {
+	xMax := len(matrix[0]) - 1
+	yMax := len(matrix) - 1
+	visited := make(map[string]int)
+
+	newGuard := Point{x: guard.x, y: guard.y}
+	walk(&newGuard, matrix, xMax, yMax, visited, nil)
+	return visited
 }
 
 func part2(guard *Point, matrix [][]byte, expected map[string]int) int {
@@ -118,7 +102,7 @@ func part2(guard *Point, matrix [][]byte, expected map[string]int) int {
 
 		visited := make(map[string]int)
 		newGuard := Point{x: guard.x, y: guard.y}
-		if !walkWithCheck(&newGuard, matrix, xMax, yMax, visited) {
+		if !walk(&newGuard, matrix, xMax, yMax, visited, func(a int) bool { return a > 4 }) {
 			count++
 		}
 

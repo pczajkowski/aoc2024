@@ -66,6 +66,10 @@ func check(equation Equation, index, result int) bool {
 	}
 
 	resultAdd := check(equation, index+1, result+equation.numbers[index])
+
+	if result == 0 {
+		result++
+	}
 	resultMul := check(equation, index+1, result*equation.numbers[index])
 
 	if resultAdd {
@@ -78,7 +82,7 @@ func check(equation Equation, index, result int) bool {
 func part1(equations []Equation) int {
 	var result int
 	for _, equation := range equations {
-		if check(equation, 0, 1) {
+		if check(equation, 0, 0) {
 			result += equation.result
 		}
 	}

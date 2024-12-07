@@ -52,6 +52,36 @@ func readInput(file *os.File) []Equation {
 	return equations
 }
 
+func check(equation Equation, index, result int) bool {
+	if index >= len(equation.numbers) {
+		if result == equation.result {
+			return true
+		}
+
+		return false
+	}
+
+	resultAdd := check(equation, index+1, result+equation.numbers[index])
+	resultMul := check(equation, index+1, result*equation.numbers[index])
+
+	if resultAdd {
+		return resultAdd
+	}
+
+	return resultMul
+}
+
+func part1(equations []Equation) int {
+	var result int
+	for _, equation := range equations {
+		if check(equation, 0, 1) {
+			result += equation.result
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -64,5 +94,5 @@ func main() {
 	}
 
 	equations := readInput(file)
-	fmt.Println(equations)
+	fmt.Println("Part1:", part1(equations))
 }

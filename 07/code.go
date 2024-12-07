@@ -53,6 +53,10 @@ func readInput(file *os.File) []Equation {
 }
 
 func check(equation Equation, index, result int) bool {
+	if result > equation.result {
+		return false
+	}
+
 	if index >= len(equation.numbers) {
 		if result == equation.result {
 			return true

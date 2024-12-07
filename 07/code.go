@@ -57,7 +57,7 @@ func concatenate(a, b int) int {
 		return b
 	}
 
-	result, _ := strconv.Atoi(strconv.Itoa(a) + strconv.Itoa(b))
+	result, _ := strconv.Atoi(fmt.Sprintf("%d%d", a, b))
 	return result
 }
 

@@ -52,7 +52,16 @@ func readInput(file *os.File) []Equation {
 	return equations
 }
 
-func check(equation Equation, index, result int) bool {
+func concatenate(a, b int) int {
+	if a == 0 {
+		return b
+	}
+
+	result, _ := strconv.Atoi(strconv.Itoa(a) + strconv.Itoa(b))
+	return result
+}
+
+func check(equation Equation, index, result int, conc bool) bool {
 	if result > equation.result {
 		return false
 	}
@@ -65,29 +74,48 @@ func check(equation Equation, index, result int) bool {
 		return false
 	}
 
-	resultAdd := check(equation, index+1, result+equation.numbers[index])
+	resultAdd := check(equation, index+1, result+equation.numbers[index], conc)
+
+	resultConc := false
+	if conc {
+		resultConc = check(equation, index+1, concatenate(result, equation.numbers[index]), conc)
+	}
 
 	if result == 0 {
 		result++
 	}
-	resultMul := check(equation, index+1, result*equation.numbers[index])
+	resultMul := check(equation, index+1, result*equation.numbers[index], conc)
 
 	if resultAdd {
 		return resultAdd
 	}
 
+	if resultConc {
+		return resultConc
+	}
+
 	return resultMul
 }
 
-func part1(equations []Equation) int {
-	var result int
+func parts(equations []Equation) (int, int) {
+	var part1 int
+	var toRecheck []Equation
 	for _, equation := range equations {
-		if check(equation, 0, 0) {
-			result += equation.result
+		if check(equation, 0, 0, false) {
+			part1 += equation.result
+		} else {
+			toRecheck = append(toRecheck, equation)
 		}
 	}
 
-	return result
+	part2 := part1
+	for _, equation := range toRecheck {
+		if check(equation, 0, 0, true) {
+			part2 += equation.result
+		}
+	}
+
+	return part1, part2
 }
 
 func main() {
@@ -102,5 +130,7 @@ func main() {
 	}
 
 	equations := readInput(file)
-	fmt.Println("Part1:", part1(equations))
+	part1, part2 := parts(equations)
+	fmt.Println("Part1:", part1)
+	fmt.Println("Part2:", part2)
 }

@@ -60,6 +60,10 @@ func checkAntinode(antinode Point, matrix [][]byte, key byte) bool {
 	return true
 }
 
+func checkInLine(antinode Point, antenna Point) bool {
+	return antinode.x == antenna.x || antinode.y == antenna.y || abs(antinode.x-antenna.x) == abs(antinode.y-antenna.y)
+}
+
 func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[string]Point {
 	antinodes := make(map[string]Point)
 
@@ -70,17 +74,21 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				deltaX := items[j].x - items[i].x
 				deltaY := items[j].y - items[i].y
 
-				if multi {
-					if items[j].x == items[i].x || items[j].y == items[i].y || abs(deltaX) == abs(deltaY) {
-						antinodes[items[i].key()] = items[i]
-						antinodes[items[j].key()] = items[j]
-					}
-				}
-
 				firstAntinode := Point{x: items[i].x - deltaX, y: items[i].y - deltaY}
 				for checkAntinode(firstAntinode, matrix, key) {
 					antinodes[firstAntinode.key()] = firstAntinode
 					if multi {
+						for _, antenna := range items {
+							_, ok := antinodes[antenna.key()]
+							if ok {
+								continue
+							}
+
+							if checkInLine(firstAntinode, antenna) {
+								antinodes[antenna.key()] = antenna
+							}
+						}
+
 						firstAntinode = Point{x: firstAntinode.x - deltaX, y: firstAntinode.y - deltaY}
 					} else {
 						firstAntinode = Point{x: -1, y: -1}
@@ -91,6 +99,17 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				for checkAntinode(secondAntinode, matrix, key) {
 					antinodes[secondAntinode.key()] = secondAntinode
 					if multi {
+						for _, antenna := range items {
+							_, ok := antinodes[antenna.key()]
+							if ok {
+								continue
+							}
+
+							if checkInLine(secondAntinode, antenna) {
+								antinodes[antenna.key()] = antenna
+							}
+						}
+
 						secondAntinode = Point{x: secondAntinode.x + deltaX, y: secondAntinode.y + deltaY}
 					} else {
 						secondAntinode = Point{x: -1, y: -1}
@@ -99,7 +118,7 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 			}
 		}
 	}
-	fmt.Println(antinodes)
+
 	return antinodes
 }
 

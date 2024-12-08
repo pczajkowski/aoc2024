@@ -40,15 +40,7 @@ func readInput(file *os.File) (map[byte][]Point, [][]byte) {
 	return groups, matrix
 }
 
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-
-	return a
-}
-
-func checkAntinode(antinode Point, matrix [][]byte, key byte) bool {
+func checkAntinode(antinode Point, matrix [][]byte) bool {
 	if antinode.x < 0 || antinode.y < 0 || antinode.y >= len(matrix) || antinode.x >= len(matrix[0]) {
 		return false
 	}
@@ -59,7 +51,7 @@ func checkAntinode(antinode Point, matrix [][]byte, key byte) bool {
 func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[string]Point {
 	antinodes := make(map[string]Point)
 
-	for key, items := range groups {
+	for _, items := range groups {
 		edge := len(items)
 		for i := range items {
 			for j := i + 1; j < edge; j++ {
@@ -67,7 +59,7 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				deltaY := items[j].y - items[i].y
 
 				firstAntinode := Point{x: items[i].x - deltaX, y: items[i].y - deltaY}
-				for checkAntinode(firstAntinode, matrix, key) {
+				for checkAntinode(firstAntinode, matrix) {
 					antinodes[firstAntinode.key()] = firstAntinode
 					if multi {
 						firstAntinode = Point{x: firstAntinode.x - deltaX, y: firstAntinode.y - deltaY}
@@ -77,7 +69,7 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				}
 
 				secondAntinode := Point{x: items[j].x + deltaX, y: items[j].y + deltaY}
-				for checkAntinode(secondAntinode, matrix, key) {
+				for checkAntinode(secondAntinode, matrix) {
 					antinodes[secondAntinode.key()] = secondAntinode
 					if multi {
 						secondAntinode = Point{x: secondAntinode.x + deltaX, y: secondAntinode.y + deltaY}

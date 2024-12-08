@@ -53,15 +53,7 @@ func checkAntinode(antinode Point, matrix [][]byte, key byte) bool {
 		return false
 	}
 
-	if matrix[antinode.y][antinode.x] == key {
-		return false
-	}
-
 	return true
-}
-
-func checkInLine(antinode Point, antenna Point) bool {
-	return antinode.x == antenna.x || antinode.y == antenna.y || abs(antinode.x-antenna.x) == abs(antinode.y-antenna.y)
 }
 
 func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[string]Point {
@@ -78,17 +70,6 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				for checkAntinode(firstAntinode, matrix, key) {
 					antinodes[firstAntinode.key()] = firstAntinode
 					if multi {
-						for _, antenna := range items {
-							_, ok := antinodes[antenna.key()]
-							if ok {
-								continue
-							}
-
-							if checkInLine(firstAntinode, antenna) {
-								antinodes[antenna.key()] = antenna
-							}
-						}
-
 						firstAntinode = Point{x: firstAntinode.x - deltaX, y: firstAntinode.y - deltaY}
 					} else {
 						firstAntinode = Point{x: -1, y: -1}
@@ -99,17 +80,6 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 				for checkAntinode(secondAntinode, matrix, key) {
 					antinodes[secondAntinode.key()] = secondAntinode
 					if multi {
-						for _, antenna := range items {
-							_, ok := antinodes[antenna.key()]
-							if ok {
-								continue
-							}
-
-							if checkInLine(secondAntinode, antenna) {
-								antinodes[antenna.key()] = antenna
-							}
-						}
-
 						secondAntinode = Point{x: secondAntinode.x + deltaX, y: secondAntinode.y + deltaY}
 					} else {
 						secondAntinode = Point{x: -1, y: -1}
@@ -120,6 +90,20 @@ func getAntinodes(groups map[byte][]Point, matrix [][]byte, multi bool) map[stri
 	}
 
 	return antinodes
+}
+
+func part2(groups map[byte][]Point, matrix [][]byte) int {
+	antinodes := getAntinodes(groups, matrix, true)
+
+	for _, items := range groups {
+		if len(items) > 1 {
+			for _, item := range items {
+				antinodes[item.key()] = item
+			}
+		}
+	}
+
+	return len(antinodes)
 }
 
 func main() {
@@ -135,5 +119,5 @@ func main() {
 
 	groups, matrix := readInput(file)
 	fmt.Println("Part1:", len(getAntinodes(groups, matrix, false)))
-	fmt.Println("Part2:", len(getAntinodes(groups, matrix, true)))
+	fmt.Println("Part2:", part2(groups, matrix))
 }

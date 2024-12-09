@@ -6,17 +6,25 @@ import (
 	"os"
 )
 
-func getDisk(diskMap []byte) (int, []int) {
-	var disk []int
-	file := true
-	var fileID int
-
-	for _, block := range diskMap {
+func getDiskMap(data []byte) []int {
+	diskMap := make([]int, len(data))
+	for i, block := range data {
 		if block < 48 || block > 57 {
 			continue
 		}
 
-		number := int(block) - 48
+		diskMap[i] = int(block) - 48
+	}
+
+	return diskMap
+}
+
+func getDisk(diskMap []int) (int, []int) {
+	var disk []int
+	file := true
+	var fileID int
+
+	for _, number := range diskMap {
 		if file {
 			file = false
 			for j := 0; j < number; j++ {
@@ -32,7 +40,7 @@ func getDisk(diskMap []byte) (int, []int) {
 		}
 	}
 
-	return int(diskMap[0]) - 48, disk
+	return diskMap[0], disk
 }
 
 func compact(disk []int, free int) []int {
@@ -68,7 +76,7 @@ func calculateChecksum(disk []int) int64 {
 	return checksum
 }
 
-func part1(diskMap []byte) int64 {
+func part1(diskMap []int) int64 {
 	free, disk := getDisk(diskMap)
 	compacted := compact(disk, free)
 
@@ -80,10 +88,11 @@ func main() {
 		log.Fatal("You need to specify a file!")
 	}
 
-	diskMap, err := os.ReadFile(os.Args[1])
+	data, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	diskMap := getDiskMap(data)
 	fmt.Println("Part1:", part1(diskMap))
 }

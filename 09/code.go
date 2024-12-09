@@ -100,7 +100,7 @@ func findFree(disk []int, start, end, goal int) (int, int) {
 			if freeStart <= 0 {
 				freeStart = i
 				for j := freeStart + 1; j < freeStart+goal; j++ {
-					if disk[i] != -1 {
+					if disk[j] != -1 {
 						freeStart = -1
 						i = j
 						break
@@ -126,7 +126,6 @@ func defrag(diskMap []int) []int {
 			fileStart := findFile(disk, disk[i], i)
 			if fileStart > 0 {
 				freeStart, freeEnd := findFree(disk, free, fileStart, i-fileStart+1)
-				fmt.Println(i, disk[i], freeStart, freeEnd)
 				if freeStart > 0 && freeEnd > 0 && freeStart < freeEnd {
 					for k := freeStart; k < freeEnd; k++ {
 						disk[k] = disk[i]
@@ -135,9 +134,9 @@ func defrag(diskMap []int) []int {
 					for k := fileStart; k <= i; k++ {
 						disk[k] = -1
 					}
-
-					i = fileStart
 				}
+
+				i = fileStart
 			}
 		}
 	}
@@ -146,9 +145,9 @@ func defrag(diskMap []int) []int {
 }
 
 func part2(diskMap []int) int64 {
-	fmt.Println(defrag(diskMap))
+	defragmented := defrag(diskMap)
 
-	return 0
+	return calculateChecksum(defragmented)
 }
 
 func main() {

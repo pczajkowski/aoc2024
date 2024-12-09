@@ -56,12 +56,23 @@ func compact(disk []int, free int) []int {
 	return disk
 }
 
-func part1(diskMap []byte) int {
+func calculateChecksum(disk []int) int64 {
+	var checksum int64
+
+	for i := range disk {
+		if disk[i] != -1 {
+			checksum += int64(disk[i] * i)
+		}
+	}
+
+	return checksum
+}
+
+func part1(diskMap []byte) int64 {
 	free, disk := getDisk(diskMap)
 	compacted := compact(disk, free)
-	fmt.Println(compacted)
 
-	return 0
+	return calculateChecksum(compacted)
 }
 
 func main() {
@@ -74,5 +85,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(part1(diskMap))
+	fmt.Println("Part1:", part1(diskMap))
 }

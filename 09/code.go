@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func getDisk(diskMap []byte) []int {
+func getDisk(diskMap []byte) (int, []int) {
 	var disk []int
 	file := true
 	var fileID int
@@ -32,12 +32,34 @@ func getDisk(diskMap []byte) []int {
 		}
 	}
 
+	return int(diskMap[0]) - 48, disk
+}
+
+func compact(disk []int, free int) []int {
+	end := len(disk) - 1
+	for free < end {
+		if disk[free] != -1 {
+			free++
+			continue
+		}
+
+		if disk[end] == -1 {
+			end--
+			continue
+		}
+
+		disk[free], disk[end] = disk[end], disk[free]
+		free++
+		end--
+	}
+
 	return disk
 }
 
 func part1(diskMap []byte) int {
-	disk := getDisk(diskMap)
-	fmt.Println(disk)
+	free, disk := getDisk(diskMap)
+	compacted := compact(disk, free)
+	fmt.Println(compacted)
 
 	return 0
 }

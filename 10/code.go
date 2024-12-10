@@ -12,7 +12,7 @@ type Point struct {
 	value byte
 }
 
-func (p *Point) key() string {
+func key(p Point) string {
 	return fmt.Sprintf("%d_%d", p.y, p.x)
 }
 
@@ -50,7 +50,7 @@ func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
 	return moves
 }
 
-func hike(reindeer Point, matrix [][]byte, xMax, yMax int) int {
+func hike(reindeer Point, matrix [][]byte, xMax, yMax int, hash func(Point) string) int {
 	var nines int
 	visited := make(map[string]bool)
 
@@ -64,9 +64,9 @@ func hike(reindeer Point, matrix [][]byte, xMax, yMax int) int {
 
 		newMoves := getMoves(current, matrix, xMax, yMax)
 		for _, newMove := range newMoves {
-			if !visited[newMove.key()] {
+			if !visited[hash(newMove)] {
 				moves = append(moves, newMove)
-				visited[newMove.key()] = true
+				visited[hash(newMove)] = true
 			}
 		}
 	}
@@ -83,7 +83,7 @@ func part1(matrix [][]byte) int {
 		for x := range matrix[y] {
 			if matrix[y][x] == '0' {
 				reindeer := Point{x: x, y: y, value: '0'}
-				result += hike(reindeer, matrix, xMax, yMax)
+				result += hike(reindeer, matrix, xMax, yMax, key)
 			}
 		}
 	}

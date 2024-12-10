@@ -91,6 +91,42 @@ func part1(matrix [][]byte) int {
 	return result
 }
 
+func hike2(reindeer Point, matrix [][]byte, xMax, yMax int) int {
+	var nines int
+
+	moves := []Point{reindeer}
+	for len(moves) > 0 {
+		current := moves[0]
+		moves = moves[1:]
+		if matrix[current.y][current.x] == '9' {
+			nines++
+		}
+
+		newMoves := getMoves(current, matrix, xMax, yMax)
+		for _, newMove := range newMoves {
+			moves = append(moves, newMove)
+		}
+	}
+
+	return nines
+}
+
+func part2(matrix [][]byte) int {
+	var result int
+	xMax := len(matrix[0])
+	yMax := len(matrix)
+
+	for y := range matrix {
+		for x := range matrix[y] {
+			if matrix[y][x] == '0' {
+				reindeer := Point{x: x, y: y, value: '0'}
+				result += hike2(reindeer, matrix, xMax, yMax)
+			}
+		}
+	}
+
+	return result
+}
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -104,4 +140,5 @@ func main() {
 
 	matrix := readInput(file)
 	fmt.Println("Part1:", part1(matrix))
+	fmt.Println("Part2:", part2(matrix))
 }

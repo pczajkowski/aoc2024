@@ -8,12 +8,12 @@ import (
 )
 
 type Point struct {
-	x, y  int
+	y, x  int
 	value byte
 }
 
 func (p *Point) key() string {
-	return fmt.Sprintf("%d_%d", p.x, p.y)
+	return fmt.Sprintf("%d_%d", p.y, p.x)
 }
 
 func readInput(file *os.File) [][]byte {
@@ -41,7 +41,7 @@ func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
 	for _, direction := range directions {
 		move := Point{x: reindeer.x + direction[0], y: reindeer.y + direction[1]}
 		if move.x >= 0 && move.x < xMax &&
-			move.y >= 0 && move.y < yMax && matrix[move.y][move.x] > reindeer.value {
+			move.y >= 0 && move.y < yMax && matrix[move.y][move.x]-reindeer.value == 1 {
 			move.value = matrix[move.y][move.x]
 			moves = append(moves, move)
 		}
@@ -58,7 +58,7 @@ func hike(reindeer Point, matrix [][]byte, xMax, yMax int) int {
 	for len(moves) > 0 {
 		current := moves[0]
 		moves = moves[1:]
-		if matrix[current.y][current.x] == '9' && !visited[current.key()] {
+		if matrix[current.y][current.x] == '9' {
 			nines++
 		}
 

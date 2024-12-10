@@ -7,13 +7,9 @@ import (
 	"os"
 )
 
-var directions [][]int = [][]int{
-	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
-}
-
 type Point struct {
-	x, y      int
-	direction int
+	x, y  int
+	value byte
 }
 
 func (p *Point) key() string {
@@ -36,6 +32,65 @@ func readInput(file *os.File) [][]byte {
 	return matrix
 }
 
+var directions [][]int = [][]int{
+	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
+}
+
+func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
+	var moves []Point
+	for _, direction := range directions {
+		move := Point{x: reindeer.x + direction[0], y: reindeer.y + direction[1]}
+		if move.x >= 0 && move.x < xMax &&
+			move.y >= 0 && move.y < yMax && matrix[move.y][move.x] > reindeer.value {
+			move.value = matrix[move.y][move.x]
+			moves = append(moves, move)
+		}
+	}
+
+	return moves
+}
+
+func hike(reindeer Point, matrix [][]byte, xMax, yMax int) int {
+	var nines int
+	visited := make(map[string]bool)
+
+	moves := []Point{reindeer}
+	for len(moves) > 0 {
+		current := moves[0]
+		moves = moves[1:]
+		if matrix[current.y][current.x] == '9' && !visited[current.key()] {
+			nines++
+		}
+
+		newMoves := getMoves(current, matrix, xMax, yMax)
+		for _, newMove := range newMoves {
+			if !visited[newMove.key()] {
+				moves = append(moves, newMove)
+				visited[newMove.key()] = true
+			}
+		}
+	}
+
+	return nines
+}
+
+func part1(matrix [][]byte) int {
+	var result int
+	xMax := len(matrix[0])
+	yMax := len(matrix)
+
+	for y := range matrix {
+		for x := range matrix[y] {
+			if matrix[y][x] == '0' {
+				reindeer := Point{x: x, y: y, value: '0'}
+				result += hike(reindeer, matrix, xMax, yMax)
+			}
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -48,5 +103,5 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println(matrix)
+	fmt.Println("Part1:", part1(matrix))
 }

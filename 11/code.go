@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func readInput(file string) []int {
+func readInput(file string) map[int]int {
 	data, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var stones []int
+	stones := make(map[int]int)
 
 	parts := strings.Split(strings.Trim(string(data), "\n"), " ")
 	for _, part := range parts {
@@ -23,7 +23,7 @@ func readInput(file string) []int {
 			log.Fatalf("Bad input %s: %s", part, err)
 		}
 
-		stones = append(stones, stone)
+		stones[stone]++
 	}
 
 	return stones
@@ -45,33 +45,35 @@ func splitStone(stoneString string) (int, int) {
 	return first, second
 }
 
-func processStones(stones []int) []int {
-	var newStones []int
-	for _, stone := range stones {
-		if stone == 0 {
-			newStones = append(newStones, 1)
-			continue
-		}
-
-		stoneString := fmt.Sprintf("%d", stone)
-		if len(stoneString)%2 == 0 {
+func processStones(stones map[int]int) map[int]int {
+	newStones := make(map[int]int)
+	for key, value := range stones {
+		if key == 0 {
+			newStones[1] += value
+		} else if stoneString := fmt.Sprintf("%d", key); len(stoneString)%2 == 0 {
 			first, second := splitStone(stoneString)
-			newStones = append(newStones, first)
-			newStones = append(newStones, second)
+			newStones[first] += value
+			newStones[second] += value
 		} else {
-			newStones = append(newStones, stone*2024)
+			m := key * 2024
+			newStones[m] += value
 		}
 	}
 
 	return newStones
 }
 
-func part1(stones []int) int {
+func part1(stones map[int]int) int {
 	for i := 0; i < 25; i++ {
 		stones = processStones(stones)
 	}
 
-	return len(stones)
+	var result int
+	for _, value := range stones {
+		result += value
+	}
+
+	return result
 }
 
 func main() {

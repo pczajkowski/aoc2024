@@ -63,11 +63,15 @@ func processStones(stones map[int]int) map[int]int {
 	return newStones
 }
 
-func part1(stones map[int]int) int {
-	for i := 0; i < 25; i++ {
+func blink(stones map[int]int, blinks int) map[int]int {
+	for i := 0; i < blinks; i++ {
 		stones = processStones(stones)
 	}
 
+	return stones
+}
+
+func countStones(stones map[int]int) int {
 	var result int
 	for _, value := range stones {
 		result += value
@@ -82,5 +86,8 @@ func main() {
 	}
 
 	stones := readInput(os.Args[1])
-	fmt.Println("Part1:", part1(stones))
+	part1Stones := blink(stones, 25)
+	fmt.Println("Part1:", countStones(part1Stones))
+	part2Stones := blink(part1Stones, 50)
+	fmt.Println("Part2:", countStones(part2Stones))
 }

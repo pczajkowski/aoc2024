@@ -50,16 +50,16 @@ func getPlots(current Point, matrix [][]byte, xMax, yMax int) []Point {
 	return plots
 }
 
-func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]bool) []Point {
+func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]bool) map[string]Point {
 	plots := []Point{start}
-	var region []Point
+	region := make(map[string]Point)
 
 	for len(plots) > 0 {
 		current := plots[0]
 		plots = plots[1:]
 
 		if !checked[current.key()] {
-			region = append(region, current)
+			region[current.key()] = current
 		}
 
 		checked[current.key()] = true
@@ -75,22 +75,47 @@ func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]
 	return region
 }
 
+func countFences(current Point, matrix [][]byte, xMax, yMax int) int {
+	var fences int
+	for _, direction := range directions {
+		plot := Point{x: current.x + direction[0], y: current.y + direction[1]}
+		if plot.x >= 0 && plot.x < xMax &&
+			plot.y >= 0 && plot.y < yMax && matrix[plot.y][plot.x] == current.value {
+			continue
+		}
+
+		fences++
+	}
+
+	return fences
+}
+
+func calculatePerimeter(region map[string]Point, matrix [][]byte, xMax, yMax int) int {
+	var perimeter int
+	for _, plot := range region {
+		perimeter += countFences(plot, matrix, xMax, yMax)
+	}
+
+	return perimeter
+}
+
 func part1(matrix [][]byte) int {
 	xMax := len(matrix[0])
 	yMax := len(matrix)
 	checked := make(map[string]bool)
+	var result int
 
 	for y := range matrix {
 		for x := range matrix[y] {
 			current := Point{x: x, y: y, value: matrix[y][x]}
 			if !checked[current.key()] {
 				region := getRegion(current, matrix, xMax, yMax, checked)
-				fmt.Println(region)
+				result += len(region) * calculatePerimeter(region, matrix, xMax, yMax)
 			}
 		}
 	}
 
-	return 0
+	return result
 }
 
 func main() {

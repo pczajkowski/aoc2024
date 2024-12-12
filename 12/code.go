@@ -74,13 +74,15 @@ func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]
 		current := plots[0]
 		plots = plots[1:]
 
-		if !checked[current.key()] {
-			if current.fences == 0 {
-				current.fences = countFences(current, matrix, xMax, yMax)
-			}
-			region[current.key()] = current
+		if checked[current.key()] {
+			continue
 		}
 
+		if current.fences == 0 {
+			current.fences = countFences(current, matrix, xMax, yMax)
+		}
+
+		region[current.key()] = current
 		checked[current.key()] = true
 
 		newPlots := getPlots(current, matrix, xMax, yMax)

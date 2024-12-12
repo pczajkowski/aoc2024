@@ -8,8 +8,9 @@ import (
 )
 
 type Point struct {
-	y, x  int
-	value byte
+	y, x   int
+	value  byte
+	fences int
 }
 
 func (p *Point) key() string {
@@ -50,6 +51,21 @@ func getPlots(current Point, matrix [][]byte, xMax, yMax int) []Point {
 	return plots
 }
 
+func countFences(current Point, matrix [][]byte, xMax, yMax int) int {
+	var fences int
+	for _, direction := range directions {
+		plot := Point{x: current.x + direction[0], y: current.y + direction[1]}
+		if plot.x >= 0 && plot.x < xMax &&
+			plot.y >= 0 && plot.y < yMax && matrix[plot.y][plot.x] == current.value {
+			continue
+		}
+
+		fences++
+	}
+
+	return fences
+}
+
 func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]bool) map[string]Point {
 	plots := []Point{start}
 	region := make(map[string]Point)
@@ -59,6 +75,9 @@ func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]
 		plots = plots[1:]
 
 		if !checked[current.key()] {
+			if current.fences == 0 {
+				current.fences = countFences(current, matrix, xMax, yMax)
+			}
 			region[current.key()] = current
 		}
 
@@ -75,28 +94,13 @@ func getRegion(start Point, matrix [][]byte, xMax, yMax int, checked map[string]
 	return region
 }
 
-func countFences(current Point, matrix [][]byte, xMax, yMax int) int {
-	var fences int
-	for _, direction := range directions {
-		plot := Point{x: current.x + direction[0], y: current.y + direction[1]}
-		if plot.x >= 0 && plot.x < xMax &&
-			plot.y >= 0 && plot.y < yMax && matrix[plot.y][plot.x] == current.value {
-			continue
-		}
-
-		fences++
-	}
-
-	return fences
-}
-
-func calculatePerimeter(region map[string]Point, matrix [][]byte, xMax, yMax int) int {
+func calculate(region map[string]Point) int {
 	var perimeter int
 	for _, plot := range region {
-		perimeter += countFences(plot, matrix, xMax, yMax)
+		perimeter += plot.fences
 	}
 
-	return perimeter
+	return perimeter * len(region)
 }
 
 func part1(matrix [][]byte) int {
@@ -109,8 +113,9 @@ func part1(matrix [][]byte) int {
 		for x := range matrix[y] {
 			current := Point{x: x, y: y, value: matrix[y][x]}
 			if !checked[current.key()] {
+				current.fences = countFences(current, matrix, xMax, yMax)
 				region := getRegion(current, matrix, xMax, yMax, checked)
-				result += len(region) * calculatePerimeter(region, matrix, xMax, yMax)
+				result += calculate(region)
 			}
 		}
 	}
@@ -130,5 +135,5 @@ func main() {
 	}
 
 	matrix := readInput(file)
-	fmt.Println(part1(matrix))
+	fmt.Println("Part1:", part1(matrix))
 }

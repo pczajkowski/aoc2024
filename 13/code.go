@@ -61,7 +61,7 @@ func min(a, b int) int {
 	return b
 }
 
-func calculate(machine Machine, button int) [2]int {
+func calculate(machine Machine, button int, limit int) [2]int {
 	var results [2]int
 	otherButton := (button + 1) % 2
 
@@ -75,15 +75,15 @@ func calculate(machine Machine, button int) [2]int {
 	}
 
 	start := min(machine.x/machine.buttons[button].x, machine.y/machine.buttons[button].y)
-	if start > 100 {
-		start = 100
+	if limit > 0 && start > limit {
+		start = limit
 	}
 
 	for ; start > 0; start-- {
 		deltaX := machine.x - start*machine.buttons[button].x
 		if deltaX%machine.buttons[otherButton].x == 0 {
 			otherPushes := deltaX / machine.buttons[otherButton].x
-			if otherPushes > 100 {
+			if limit > 0 && otherPushes > limit {
 				continue
 			}
 
@@ -100,9 +100,9 @@ func calculate(machine Machine, button int) [2]int {
 	return results
 }
 
-func checkMachine(machine Machine) int {
-	resultA := calculate(machine, 0)
-	resultB := calculate(machine, 1)
+func checkMachine(machine Machine, limit int) int {
+	resultA := calculate(machine, 0, limit)
+	resultB := calculate(machine, 1, limit)
 
 	costA := resultA[0]*3 + resultA[1]
 	costB := resultB[0]*3 + resultB[1]
@@ -110,10 +110,10 @@ func checkMachine(machine Machine) int {
 	return min(costA, costB)
 }
 
-func part1(machines []Machine) int {
+func solve(machines []Machine, limit int) int {
 	var result int
 	for _, machine := range machines {
-		result += checkMachine(machine)
+		result += checkMachine(machine, limit)
 	}
 
 	return result
@@ -131,5 +131,5 @@ func main() {
 	}
 
 	machines := readInput(file)
-	fmt.Println("Part1:", part1(machines))
+	fmt.Println("Part1:", solve(machines, 100))
 }

@@ -66,9 +66,12 @@ func calculate(machine Machine, button int) [2]int {
 	otherButton := (button + 1) % 2
 
 	if machine.x%machine.buttons[button].x == 0 && machine.y%machine.buttons[button].y == 0 {
-		results[button] = machine.x / machine.buttons[button].x
-		results[otherButton] = 0
-		return results
+		pushes := machine.x / machine.buttons[button].x
+		if pushes*machine.buttons[button].y == machine.y {
+			results[button] = pushes
+			results[otherButton] = 0
+			return results
+		}
 	}
 
 	start := min(machine.x/machine.buttons[button].x, machine.y/machine.buttons[button].y)

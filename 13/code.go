@@ -86,9 +86,13 @@ func calculate(machine Machine, button int) [2]int {
 }
 
 func checkMachine(machine Machine) int {
-	results := calculate(machine, 0)
+	resultA := calculate(machine, 0)
+	resultB := calculate(machine, 1)
 
-	return results[0]*3 + results[1]
+	costA := resultA[0]*3 + resultA[1]
+	costB := resultB[0]*3 + resultB[1]
+
+	return min(costA, costB)
 }
 
 func part1(machines []Machine) int {

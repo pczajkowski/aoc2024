@@ -41,8 +41,12 @@ func readInput(file *os.File) []Machine {
 
 			machine.buttons = append(machine.buttons, button)
 			buttonsRead++
+		} else {
+			n, err := fmt.Sscanf(line, "Prize: X=%d, Y=%d", &machine.x, &machine.y)
+			if n != 2 || err != nil {
+				log.Fatalf("Not able to parse machine '%s': %s", line, err)
+			}
 		}
-
 	}
 
 	machines = append(machines, machine)

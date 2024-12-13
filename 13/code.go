@@ -72,11 +72,18 @@ func calculate(machine Machine, button int) [2]int {
 	}
 
 	start := min(machine.x/machine.buttons[button].x, machine.y/machine.buttons[button].y)
+	if start > 100 {
+		start = 100
+	}
+
 	for start > 0 {
 		if (machine.x-start*machine.buttons[button].x)%machine.buttons[otherButton].x == 0 && (machine.y-start*machine.buttons[button].y)%machine.buttons[otherButton].y == 0 {
-			results[button] = start
-			results[otherButton] = (machine.x - start*machine.buttons[button].x) / machine.buttons[otherButton].x
-			return results
+			otherPushes := (machine.x - start*machine.buttons[button].x) / machine.buttons[otherButton].x
+			if otherPushes <= 100 {
+				results[button] = start
+				results[otherButton] = otherPushes
+				return results
+			}
 		}
 
 		start--

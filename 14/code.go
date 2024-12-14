@@ -72,16 +72,27 @@ func part1(robots []Robot, maxX, maxY, after int) int {
 	midX := maxX / 2
 	midY := maxY / 2
 
-	var count int
+	var q1, q2, q3, q4 int
 	robotsMoved := robotsAfter(robots, maxX, maxY, after)
-	fmt.Println(robotsMoved)
 	for _, robot := range robotsMoved {
-		if robot.x != midX && robot.y != midY {
-			count++
+		if robot.x < midX && robot.y < midY {
+			q1++
+		}
+
+		if robot.x > midX && robot.y < midY {
+			q2++
+		}
+
+		if robot.x < midX && robot.y > midY {
+			q3++
+		}
+
+		if robot.x > midX && robot.y > midY {
+			q4++
 		}
 	}
 
-	return count
+	return q1 * q2 * q3 * q4
 }
 
 func main() {
@@ -97,6 +108,5 @@ func main() {
 
 	robots := readInput(file)
 	maxX, maxY := getMaxXY(robots)
-	fmt.Println(maxX, maxY)
 	fmt.Println("Part1:", part1(robots, maxX, maxY, 100))
 }

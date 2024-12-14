@@ -50,12 +50,22 @@ func getMaxXY(robots []Robot) (int, int) {
 }
 
 func robotsAfter(robots []Robot, maxX, maxY, after int) []Robot {
-	for _, robot := range robots {
+	robotsMoved := make([]Robot, len(robots))
+	for i, robot := range robots {
 		robot.x = (robot.vX*after + robot.x) % maxX
+		if robot.x < 0 {
+			robot.x = maxX + robot.x
+		}
+
 		robot.y = (robot.vY*after + robot.y) % maxY
+		if robot.y < 0 {
+			robot.y = maxY + robot.y
+		}
+
+		robotsMoved[i] = robot
 	}
 
-	return robots
+	return robotsMoved
 }
 
 func part1(robots []Robot, maxX, maxY, after int) int {

@@ -96,18 +96,32 @@ func processMoves(robot *Point, matrix [][]byte, moves []byte) {
 		switch move {
 		case '^':
 			moveRobot(robot, matrix, 0, -1)
-			fmt.Println(robot, matrix)
 		case 'v':
 			moveRobot(robot, matrix, 0, 1)
-			fmt.Println(robot, matrix)
 		case '<':
 			moveRobot(robot, matrix, -1, 0)
-			fmt.Println(robot, matrix)
 		case '>':
 			moveRobot(robot, matrix, 1, 0)
-			fmt.Println(robot, matrix)
 		}
 	}
+}
+
+func calculateBoxes(matrix [][]byte) int {
+	var result int
+	for y := range matrix {
+		for x := range matrix[y] {
+			if matrix[y][x] == 'O' {
+				result += 100*y + x
+			}
+		}
+	}
+
+	return result
+}
+
+func part1(robot *Point, matrix [][]byte, moves []byte) int {
+	processMoves(robot, matrix, moves)
+	return calculateBoxes(matrix)
 }
 
 func main() {
@@ -122,5 +136,5 @@ func main() {
 	}
 
 	robot, matrix, moves := readInput(file)
-	processMoves(robot, matrix, moves)
+	fmt.Println("Part1:", part1(robot, matrix, moves))
 }

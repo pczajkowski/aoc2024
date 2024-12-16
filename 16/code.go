@@ -67,7 +67,7 @@ func getMoves(reindeer Point, matrix [][]byte) []Point {
 			if reindeer.direction[0] == direction[0] && reindeer.direction[1] == direction[1] {
 				move.cost++
 			} else {
-				move.cost += 1000
+				move.cost += 1001
 			}
 
 			moves = append(moves, move)

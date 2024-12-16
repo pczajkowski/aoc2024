@@ -59,12 +59,11 @@ var directions [][]int = [][]int{
 	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
 }
 
-func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
+func getMoves(reindeer Point, matrix [][]byte) []Point {
 	var moves []Point
 	for _, direction := range directions {
 		move := Point{x: reindeer.x + direction[0], y: reindeer.y + direction[1], cost: reindeer.cost, direction: direction}
-		if move.x >= 0 && move.x < xMax &&
-			move.y >= 0 && move.y < yMax && matrix[move.y][move.x] != '#' {
+		if matrix[move.y][move.x] != '#' {
 			if reindeer.direction[0] == direction[0] && reindeer.direction[1] == direction[1] {
 				move.cost++
 			} else {
@@ -78,7 +77,7 @@ func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
 	return moves
 }
 
-func hike(reindeer *Point, matrix [][]byte, xMax, yMax int) int {
+func hike(reindeer *Point, matrix [][]byte) int {
 	cost := 1000000000
 	visited := make(map[string]int)
 
@@ -90,7 +89,7 @@ func hike(reindeer *Point, matrix [][]byte, xMax, yMax int) int {
 			cost = current.cost
 		}
 
-		newMoves := getMoves(current, matrix, xMax, yMax)
+		newMoves := getMoves(current, matrix)
 		for _, newMove := range newMoves {
 			if visited[newMove.key()] == 0 || visited[newMove.key()] > newMove.cost {
 				moves = append(moves, newMove)
@@ -114,5 +113,5 @@ func main() {
 	}
 
 	reindeer, matrix := readInput(file)
-	fmt.Println("Part1:", hike(reindeer, matrix, len(matrix[0]), len(matrix)))
+	fmt.Println("Part1:", hike(reindeer, matrix))
 }

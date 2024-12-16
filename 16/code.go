@@ -18,6 +18,10 @@ func (p *Point) key() string {
 	return fmt.Sprintf("%d_%d", p.y, p.x)
 }
 
+func (p *Point) keyWithDirection() string {
+	return fmt.Sprintf("%d_%d_%d_%d", p.y, p.x, p.direction[1], p.direction[0])
+}
+
 func findReindeer(line string, mark byte) *Point {
 	for i := range line {
 		if line[i] == mark {
@@ -94,9 +98,9 @@ func hike(reindeer *Point, matrix [][]byte) (int, []*Point) {
 
 		newMoves := getMoves(current, matrix)
 		for _, newMove := range newMoves {
-			if visited[newMove.key()] == 0 || visited[newMove.key()] >= newMove.cost {
+			if visited[newMove.keyWithDirection()] == 0 || visited[newMove.keyWithDirection()] >= newMove.cost {
 				moves = append(moves, newMove)
-				visited[newMove.key()] = newMove.cost
+				visited[newMove.keyWithDirection()] = newMove.cost
 			}
 		}
 	}

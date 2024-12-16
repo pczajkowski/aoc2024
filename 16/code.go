@@ -8,7 +8,13 @@ import (
 )
 
 type Point struct {
-	y, x int
+	y, x      int
+	cost      int
+	direction []int
+}
+
+func (p *Point) key() string {
+	return fmt.Sprintf("%d_%d", p.y, p.x)
 }
 
 func findReindeer(line string, mark byte) *Point {
@@ -38,6 +44,7 @@ func readInput(file *os.File) (*Point, [][]byte) {
 			reindeer = findReindeer(line, 'S')
 			if reindeer != nil {
 				reindeer.y = y
+				reindeer.direction = []int{1, 0}
 			}
 
 			y++
@@ -46,6 +53,53 @@ func readInput(file *os.File) (*Point, [][]byte) {
 	}
 
 	return reindeer, matrix
+}
+
+var directions [][]int = [][]int{
+	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
+}
+
+func getMoves(reindeer Point, matrix [][]byte, xMax, yMax int) []Point {
+	var moves []Point
+	for _, direction := range directions {
+		move := Point{x: reindeer.x + direction[0], y: reindeer.y + direction[1], cost: reindeer.cost, direction: direction}
+		if move.x >= 0 && move.x < xMax &&
+			move.y >= 0 && move.y < yMax && matrix[move.y][move.x] != '#' {
+			if reindeer.direction[0] == direction[0] && reindeer.direction[1] == direction[1] {
+				move.cost++
+			} else {
+				move.cost += 1000
+			}
+
+			moves = append(moves, move)
+		}
+	}
+
+	return moves
+}
+
+func hike(reindeer *Point, matrix [][]byte, xMax, yMax int) int {
+	cost := 1000000000
+	visited := make(map[string]int)
+
+	moves := []Point{*reindeer}
+	for len(moves) > 0 {
+		current := moves[0]
+		moves = moves[1:]
+		if matrix[current.y][current.x] == 'E' && current.cost < cost {
+			cost = current.cost
+		}
+
+		newMoves := getMoves(current, matrix, xMax, yMax)
+		for _, newMove := range newMoves {
+			if visited[newMove.key()] == 0 || visited[newMove.key()] > newMove.cost {
+				moves = append(moves, newMove)
+				visited[newMove.key()] = newMove.cost
+			}
+		}
+	}
+
+	return cost
 }
 
 func main() {
@@ -60,5 +114,5 @@ func main() {
 	}
 
 	reindeer, matrix := readInput(file)
-	fmt.Println(reindeer, matrix)
+	fmt.Println("Part1:", hike(reindeer, matrix, len(matrix[0]), len(matrix)))
 }

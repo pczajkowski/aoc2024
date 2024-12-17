@@ -52,6 +52,61 @@ func readInput(file *os.File) ([]Register, []int) {
 	return registers, program
 }
 
+func getCombo(operand int, registers []Register) int {
+	if operand >= 0 && operand <= 3 {
+		return operand
+	}
+
+	switch operand {
+	case 4:
+		return registers[0].value
+	case 5:
+		return registers[1].value
+	case 6:
+		return registers[2].value
+	case 7:
+		log.Fatal("Bad instruction!")
+	}
+
+	return -1000000
+}
+
+func process(registers []Register, program []int) []int {
+	edge := len(program) - 1
+	var instructionPointer int
+	var results []int
+
+	for instructionPointer < edge {
+		switch program[instructionPointer] {
+		case 0:
+			registers[0].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
+		case 1:
+			registers[1].value ^= program[instructionPointer+1]
+		case 2:
+			registers[1].value = getCombo(program[instructionPointer+1], registers) % 8
+		case 3:
+			if registers[0].value > 0 {
+				instructionPointer = program[instructionPointer+1]
+				continue
+			}
+		case 4:
+			registers[1].value ^= registers[2].value
+		case 5:
+			results = append(results, getCombo(program[instructionPointer+1], registers)%8)
+		case 6:
+			registers[1].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
+		case 7:
+			registers[3].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
+
+		}
+
+		instructionPointer += 2
+		fmt.Println(instructionPointer, registers, results)
+	}
+
+	return results
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -64,5 +119,5 @@ func main() {
 	}
 
 	registers, program := readInput(file)
-	fmt.Println(registers, program)
+	fmt.Println(process(registers, program))
 }

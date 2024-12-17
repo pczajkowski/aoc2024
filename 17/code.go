@@ -80,10 +80,11 @@ func powerOfTwo(power int) int {
 	return result
 }
 
-func process(registers []Register, program []int) []int {
+func process(registers []Register, program []int, withCheck bool) []int {
 	edge := len(program) - 1
 	var instructionPointer int
 	var results []int
+	var resultIndex int
 
 	for instructionPointer < edge {
 		switch program[instructionPointer] {
@@ -101,7 +102,13 @@ func process(registers []Register, program []int) []int {
 		case 4:
 			registers[1].value ^= registers[2].value
 		case 5:
-			results = append(results, getCombo(program[instructionPointer+1], registers)%8)
+			result := getCombo(program[instructionPointer+1], registers) % 8
+			if withCheck && result != program[resultIndex] {
+				return []int{}
+			}
+
+			results = append(results, result)
+			resultIndex++
 		case 6:
 			registers[1].value = registers[0].value / (powerOfTwo(getCombo(program[instructionPointer+1], registers)))
 		case 7:
@@ -123,6 +130,27 @@ func arrayToString(arr []int) string {
 	return strings.Join(strSlice, ",")
 }
 
+func part2(registers []Register, program []int, initialA int) int {
+	registers[0].value = initialA
+	modifier := 1
+
+	for {
+		registers[0].value = initialA + modifier
+		registers[1].value = 0
+		registers[2].value = 0
+
+		arr := process(registers, program, true)
+		if len(arr) > 0 && len(arr) == len(program) {
+			fmt.Println(arr, program)
+			return initialA + modifier
+		}
+
+		modifier++
+	}
+
+	return -1
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -135,5 +163,7 @@ func main() {
 	}
 
 	registers, program := readInput(file)
-	fmt.Println("Part1:", arrayToString(process(registers, program)))
+	initialA := registers[0].value
+	fmt.Println("Part1:", arrayToString(process(registers, program, false)))
+	fmt.Println("Part2:", part2(registers, program, initialA))
 }

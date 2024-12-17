@@ -71,6 +71,15 @@ func getCombo(operand int, registers []Register) int {
 	return -1000000
 }
 
+func powerOfTwo(power int) int {
+	result := 1
+	for i := 0; i < power; i++ {
+		result *= 2
+	}
+
+	return result
+}
+
 func process(registers []Register, program []int) []int {
 	edge := len(program) - 1
 	var instructionPointer int
@@ -79,7 +88,7 @@ func process(registers []Register, program []int) []int {
 	for instructionPointer < edge {
 		switch program[instructionPointer] {
 		case 0:
-			registers[0].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
+			registers[0].value = registers[0].value / (powerOfTwo(getCombo(program[instructionPointer+1], registers)))
 		case 1:
 			registers[1].value ^= program[instructionPointer+1]
 		case 2:
@@ -101,10 +110,18 @@ func process(registers []Register, program []int) []int {
 		}
 
 		instructionPointer += 2
-		fmt.Println(instructionPointer, registers, results)
 	}
 
 	return results
+}
+
+func arrayToString(arr []int) string {
+	strSlice := make([]string, len(arr))
+	for i := range arr {
+		strSlice[i] = fmt.Sprintf("%d", arr[i])
+	}
+
+	return strings.Join(strSlice, ",")
 }
 
 func main() {
@@ -119,5 +136,5 @@ func main() {
 	}
 
 	registers, program := readInput(file)
-	fmt.Println(process(registers, program))
+	fmt.Println("Part1:", arrayToString(process(registers, program)))
 }

@@ -103,10 +103,9 @@ func process(registers []Register, program []int) []int {
 		case 5:
 			results = append(results, getCombo(program[instructionPointer+1], registers)%8)
 		case 6:
-			registers[1].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
+			registers[1].value = registers[0].value / (powerOfTwo(getCombo(program[instructionPointer+1], registers)))
 		case 7:
-			registers[3].value = registers[0].value / (getCombo(program[instructionPointer+1], registers) * getCombo(program[instructionPointer+1], registers))
-
+			registers[2].value = registers[0].value / (powerOfTwo(getCombo(program[instructionPointer+1], registers)))
 		}
 
 		instructionPointer += 2

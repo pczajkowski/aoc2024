@@ -85,7 +85,7 @@ func hike(obstaclesMap map[string]bool, xMax, yMax int) int {
 
 		newMoves := getMoves(current, obstaclesMap, xMax, yMax)
 		for _, newMove := range newMoves {
-			if visited[newMove.key()] == 0 || visited[newMove.key()] >= newMove.steps {
+			if visited[newMove.key()] == 0 || visited[newMove.key()] > newMove.steps {
 				moves = append(moves, newMove)
 				visited[newMove.key()] = newMove.steps
 			}
@@ -96,7 +96,7 @@ func hike(obstaclesMap map[string]bool, xMax, yMax int) int {
 }
 
 func part1(obstacles []Point, howMany, xMax, yMax int) int {
-	obstaclesMap := getObstaclesMap(obstacles, howMany, xMax, yMax)
+	obstaclesMap := getObstaclesMap(obstacles, howMany, xMax+1, yMax+1)
 	return hike(obstaclesMap, xMax, yMax)
 }
 
@@ -112,5 +112,5 @@ func main() {
 	}
 
 	obstacles := readInput(file)
-	fmt.Println("Part1:", part1(obstacles, 12, 6, 6))
+	fmt.Println("Part1:", part1(obstacles, 1024, 70, 70))
 }

@@ -100,6 +100,26 @@ func part1(obstacles []Point, howMany, xMax, yMax int) int {
 	return hike(obstaclesMap, xMax, yMax)
 }
 
+func addAnotherObstacle(obstaclesMap map[string]bool, xMax, yMax int, obstacles []Point, index int) {
+	if obstacles[index].x < xMax && obstacles[index].y < yMax {
+		obstaclesMap[obstacles[index].key()] = true
+	}
+}
+
+func part2(obstacles []Point, howMany, xMax, yMax int) Point {
+	obstaclesMap := getObstaclesMap(obstacles, howMany, xMax+1, yMax+1)
+	edge := len(obstacles)
+
+	for i := howMany + 1; i < edge; i++ {
+		addAnotherObstacle(obstaclesMap, xMax+1, yMax+1, obstacles, i)
+		if hike(obstaclesMap, xMax, yMax) == 1000000000 {
+			return obstacles[i]
+		}
+	}
+
+	return obstacles[0]
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -113,4 +133,6 @@ func main() {
 
 	obstacles := readInput(file)
 	fmt.Println("Part1:", part1(obstacles, 1024, 70, 70))
+	badPoint := part2(obstacles, 1024, 70, 70)
+	fmt.Println("Part2:", fmt.Sprintf("%d,%d", badPoint.x, badPoint.y))
 }

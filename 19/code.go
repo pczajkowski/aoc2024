@@ -79,6 +79,38 @@ func getPossibleTowers(patterns [][]string, towels []string) []string {
 	return possible
 }
 
+func checkTowel2(towel string, index int, patterns [][]string) int {
+	var count int
+	if index >= len(towel) {
+		return 1
+	}
+
+	for _, pattern := range patterns[towel[index]-delta] {
+		patternMatch := true
+		for i := range pattern {
+			if index+i >= len(towel) || pattern[i] != towel[index+i] {
+				patternMatch = false
+				break
+			}
+		}
+
+		if patternMatch {
+			count += checkTowel2(towel, index+len(pattern), patterns)
+		}
+	}
+
+	return count
+}
+
+func part2(patterns [][]string, towels []string) int {
+	var count int
+	for _, towel := range towels {
+		count += checkTowel2(towel, 0, patterns)
+	}
+
+	return count
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -93,4 +125,5 @@ func main() {
 	patterns, towels := readInput(file)
 	possible := getPossibleTowers(patterns, towels)
 	fmt.Println("Part1:", len(possible))
+	fmt.Println("Part2:", part2(patterns, possible))
 }

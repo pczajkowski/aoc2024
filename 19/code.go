@@ -67,16 +67,16 @@ func checkTowel(towel string, index int, patterns [][]string, checked map[string
 	return false
 }
 
-func part1(patterns [][]string, towels []string) int {
-	var count int
+func getPossibleTowers(patterns [][]string, towels []string) []string {
+	var possible []string
 	for _, towel := range towels {
 		checked := make(map[string]bool)
 		if checkTowel(towel, 0, patterns, checked) {
-			count++
+			possible = append(possible, towel)
 		}
 	}
 
-	return count
+	return possible
 }
 
 func main() {
@@ -91,5 +91,6 @@ func main() {
 	}
 
 	patterns, towels := readInput(file)
-	fmt.Println("Part1:", part1(patterns, towels))
+	possible := getPossibleTowers(patterns, towels)
+	fmt.Println("Part1:", len(possible))
 }

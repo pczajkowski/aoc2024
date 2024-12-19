@@ -36,6 +36,39 @@ func readInput(file *os.File) ([][]string, []string) {
 	return patterns, towels
 }
 
+func checkTowel(towel string, index int, patterns [][]string) bool {
+	if index >= len(towel) {
+		return true
+	}
+
+	for _, pattern := range patterns[towel[index]-delta] {
+		patternMatch := true
+		for i := range pattern {
+			if index+i >= len(towel) || pattern[i] != towel[index+i] {
+				patternMatch = false
+				break
+			}
+		}
+
+		if patternMatch && checkTowel(towel, index+len(pattern), patterns) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func part1(patterns [][]string, towels []string) int {
+	var count int
+	for _, towel := range towels {
+		if checkTowel(towel, 0, patterns) {
+			count++
+		}
+	}
+
+	return count
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -48,5 +81,5 @@ func main() {
 	}
 
 	patterns, towels := readInput(file)
-	fmt.Println(patterns, towels)
+	fmt.Println("Part1:", part1(patterns, towels))
 }

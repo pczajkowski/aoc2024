@@ -118,8 +118,8 @@ func getMax(patterns [][]string) int {
 
 func part2(patterns [][]string, towels []string) int {
 	var count int
+	maxPatterns := getMax(patterns) * 2
 	for _, towel := range towels {
-		maxPatterns := getMax(patterns)
 		checked := make(map[string]int)
 		count += checkTowel2(towel, 0, patterns, checked, maxPatterns)
 	}

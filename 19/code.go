@@ -36,12 +36,21 @@ func readInput(file *os.File) ([][]string, []string) {
 	return patterns, towels
 }
 
-func checkTowel(towel string, index int, patterns [][]string) bool {
+func patternAndIndex(pattern string, index int) string {
+	return fmt.Sprintf("%s_%d", pattern, index)
+}
+
+func checkTowel(towel string, index int, patterns [][]string, checked map[string]bool) bool {
 	if index >= len(towel) {
 		return true
 	}
 
 	for _, pattern := range patterns[towel[index]-delta] {
+		if checked[patternAndIndex(pattern, index)] {
+			continue
+		}
+
+		checked[patternAndIndex(pattern, index)] = true
 		patternMatch := true
 		for i := range pattern {
 			if index+i >= len(towel) || pattern[i] != towel[index+i] {
@@ -50,7 +59,7 @@ func checkTowel(towel string, index int, patterns [][]string) bool {
 			}
 		}
 
-		if patternMatch && checkTowel(towel, index+len(pattern), patterns) {
+		if patternMatch && checkTowel(towel, index+len(pattern), patterns, checked) {
 			return true
 		}
 	}
@@ -61,7 +70,8 @@ func checkTowel(towel string, index int, patterns [][]string) bool {
 func part1(patterns [][]string, towels []string) int {
 	var count int
 	for _, towel := range towels {
-		if checkTowel(towel, 0, patterns) {
+		checked := make(map[string]bool)
+		if checkTowel(towel, 0, patterns, checked) {
 			count++
 		}
 	}

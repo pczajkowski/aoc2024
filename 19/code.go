@@ -79,13 +79,18 @@ func getPossibleTowers(patterns [][]string, towels []string) []string {
 	return possible
 }
 
-func checkTowel2(towel string, index int, patterns [][]string) int {
+func checkTowel2(towel string, index int, patterns [][]string, checked map[string]int, maxPatterns int) int {
 	var count int
 	if index >= len(towel) {
 		return 1
 	}
 
 	for _, pattern := range patterns[towel[index]-delta] {
+		if checked[patternAndIndex(pattern, index)] > maxPatterns {
+			continue
+		}
+
+		checked[patternAndIndex(pattern, index)]++
 		patternMatch := true
 		for i := range pattern {
 			if index+i >= len(towel) || pattern[i] != towel[index+i] {
@@ -95,17 +100,28 @@ func checkTowel2(towel string, index int, patterns [][]string) int {
 		}
 
 		if patternMatch {
-			count += checkTowel2(towel, index+len(pattern), patterns)
+			count += checkTowel2(towel, index+len(pattern), patterns, checked, maxPatterns)
 		}
 	}
 
 	return count
 }
 
+func getMax(patterns [][]string) int {
+	var maxPatterns int
+	for _, letter := range patterns {
+		maxPatterns += len(letter)
+	}
+
+	return maxPatterns
+}
+
 func part2(patterns [][]string, towels []string) int {
 	var count int
 	for _, towel := range towels {
-		count += checkTowel2(towel, 0, patterns)
+		maxPatterns := getMax(patterns)
+		checked := make(map[string]int)
+		count += checkTowel2(towel, 0, patterns, checked, maxPatterns)
 	}
 
 	return count

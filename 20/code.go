@@ -10,7 +10,6 @@ import (
 type Point struct {
 	y, x      int
 	cost      int
-	cheats    int
 	cheatedAt *Point
 }
 
@@ -61,7 +60,7 @@ var directions [][]int = [][]int{
 func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool) []Point {
 	var moves []Point
 	for _, direction := range directions {
-		move := Point{x: current.x + direction[0], y: current.y + direction[1], cost: current.cost + 1, cheats: current.cheats, cheatedAt: current.cheatedAt}
+		move := Point{x: current.x + direction[0], y: current.y + direction[1], cost: current.cost + 1, cheatedAt: current.cheatedAt}
 		if move.x <= 0 || move.y <= 0 || move.x >= xMax || move.y >= yMax {
 			continue
 		}
@@ -73,10 +72,6 @@ func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats
 			}
 
 			continue
-		}
-
-		if cheat && move.cheats == 1 {
-			move.cheats = 0
 		}
 
 		moves = append(moves, move)
@@ -94,7 +89,7 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 	for len(moves) > 0 {
 		current := moves[0]
 		moves = moves[1:]
-		if matrix[current.y][current.x] == 'E' && current.cost < cost {
+		if matrix[current.y][current.x] == 'E' && current.cost <= cost {
 			cost = current.cost
 			if cheat && current.cheatedAt != nil {
 				cheats[current.cheatedAt.key()] = true
@@ -103,7 +98,7 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 
 		newMoves := getMoves(current, matrix, xMax, yMax, cheat, cheats)
 		for _, newMove := range newMoves {
-			if visited[newMove.key()] == 0 || visited[newMove.key()] > newMove.cost {
+			if visited[newMove.key()] == 0 || visited[newMove.key()] >= newMove.cost {
 				moves = append(moves, newMove)
 				visited[newMove.key()] = newMove.cost
 			}
@@ -120,6 +115,7 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 	cheats := make(map[string]bool)
 	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats)
 	var count int
+	savings := make(map[int]int)
 	for {
 		score := hike(start, matrix, xMax, yMax, true, cheats)
 		if score >= 1000000000 {
@@ -132,8 +128,9 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 		} else if saving >= atLeast {
 			count++
 		}
+		savings[saving]++
 	}
-
+	fmt.Println(savings)
 	return count
 }
 
@@ -149,5 +146,5 @@ func main() {
 	}
 
 	start, matrix := readInput(file)
-	fmt.Println("Part1:", part1(start, matrix, 100))
+	fmt.Println("Part1:", part1(start, matrix, 1))
 }

@@ -89,16 +89,18 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 	for len(moves) > 0 {
 		current := moves[0]
 		moves = moves[1:]
-		if matrix[current.y][current.x] == 'E' && (current.cost <= cost || cheat && current.cost < bestWithoutCheating) {
-			cost = current.cost
-			if cheat {
-				saving := bestWithoutCheating - current.cost
-				savings[saving]++
+		if matrix[current.y][current.x] == 'E' {
+			if current.cost <= cost || cheat && current.cost < bestWithoutCheating {
+				cost = current.cost
+				if cheat && current.cheatedAt != nil {
+					saving := bestWithoutCheating - current.cost
+					savings[saving]++
 
-				if current.cheatedAt != nil {
 					cheats[current.cheatedAt.key()] = true
 				}
 			}
+
+			continue
 		}
 
 		newMoves := getMoves(current, matrix, xMax, yMax, cheat, cheats)

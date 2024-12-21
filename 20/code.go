@@ -103,6 +103,10 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 
 		newMoves := getMoves(current, matrix, xMax, yMax, cheat, cheats)
 		for _, newMove := range newMoves {
+			if cheat && newMove.cost >= bestWithoutCheating {
+				continue
+			}
+
 			if visited[newMove.key()] == 0 || visited[newMove.key()] >= newMove.cost {
 				moves = append(moves, newMove)
 				visited[newMove.key()] = newMove.cost

@@ -80,7 +80,7 @@ func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats
 	return moves
 }
 
-func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool) int {
+func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool, bestWithoutCheating int, savings map[int]int) int {
 	cost := 1000000000
 	visited := make(map[string]int)
 	visited[start.key()] = start.cost
@@ -89,10 +89,15 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 	for len(moves) > 0 {
 		current := moves[0]
 		moves = moves[1:]
-		if matrix[current.y][current.x] == 'E' && current.cost <= cost {
+		if matrix[current.y][current.x] == 'E' && (current.cost <= cost || cheat && current.cost < bestWithoutCheating) {
 			cost = current.cost
-			if cheat && current.cheatedAt != nil {
-				cheats[current.cheatedAt.key()] = true
+			if cheat {
+				saving := bestWithoutCheating - current.cost
+				savings[saving]++
+
+				if current.cheatedAt != nil {
+					cheats[current.cheatedAt.key()] = true
+				}
 			}
 		}
 
@@ -113,20 +118,14 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 	yMax := len(matrix) - 1
 
 	cheats := make(map[string]bool)
-	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats)
-	var count int
 	savings := make(map[int]int)
+	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats, 0, savings)
+	var count int
 	for {
-		score := hike(start, matrix, xMax, yMax, true, cheats)
+		score := hike(start, matrix, xMax, yMax, true, cheats, bestWithoutCheating, savings)
 		if score >= bestWithoutCheating {
 			break
 		}
-
-		saving := bestWithoutCheating - score
-		if saving >= atLeast {
-			count++
-		}
-		savings[saving]++
 	}
 	fmt.Println(savings)
 	return count

@@ -90,9 +90,9 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 		current := moves[0]
 		moves = moves[1:]
 		if matrix[current.y][current.x] == 'E' {
-			if current.cost <= cost || cheat && current.cost < bestWithoutCheating {
+			if current.cost <= cost {
 				cost = current.cost
-				if cheat && current.cheatedAt != nil {
+				if cheat && current.cost < bestWithoutCheating {
 					saving := bestWithoutCheating - current.cost
 					savings[saving]++
 
@@ -126,14 +126,21 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 	cheats := make(map[string]bool)
 	savings := make(map[int]int)
 	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats, 0, savings)
-	var count int
+	haltAt := bestWithoutCheating - atLeast
 	for {
 		score := hike(start, matrix, xMax, yMax, true, cheats, bestWithoutCheating, savings)
-		if score >= bestWithoutCheating {
+		if score >= haltAt {
 			break
 		}
 	}
-	fmt.Println(savings)
+
+	var count int
+	for key, value := range savings {
+		if key >= atLeast {
+			count += value
+		}
+	}
+
 	return count
 }
 
@@ -149,5 +156,5 @@ func main() {
 	}
 
 	start, matrix := readInput(file)
-	fmt.Println("Part1:", part1(start, matrix, 1))
+	fmt.Println("Part1:", part1(start, matrix, 100))
 }

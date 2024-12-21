@@ -118,14 +118,12 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 	savings := make(map[int]int)
 	for {
 		score := hike(start, matrix, xMax, yMax, true, cheats)
-		if score >= 1000000000 {
+		if score >= bestWithoutCheating {
 			break
 		}
 
 		saving := bestWithoutCheating - score
-		if saving == 0 {
-			break
-		} else if saving >= atLeast {
+		if saving >= atLeast {
 			count++
 		}
 		savings[saving]++

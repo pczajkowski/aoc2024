@@ -45,7 +45,6 @@ func readInput(file *os.File) (*Point, [][]byte) {
 			start = findPoint(line, 'S')
 			if start != nil {
 				start.y = y
-				start.cheats = 2
 			}
 		}
 
@@ -68,12 +67,8 @@ func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats
 		}
 
 		if matrix[move.y][move.x] == '#' {
-			if cheat && !cheats[move.key()] && move.cheats > 0 {
-				if move.cheatedAt == nil {
-					move.cheatedAt = &move
-				}
-
-				move.cheats--
+			if cheat && !cheats[move.key()] && move.cheatedAt == nil {
+				move.cheatedAt = &move
 				moves = append(moves, move)
 			}
 
@@ -118,12 +113,13 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 	return cost
 }
 
-func part1(start *Point, matrix [][]byte) int {
+func part1(start *Point, matrix [][]byte, atLeast int) int {
 	xMax := len(matrix[0]) - 1
 	yMax := len(matrix) - 1
 
 	cheats := make(map[string]bool)
 	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats)
+	var count int
 	for {
 		score := hike(start, matrix, xMax, yMax, true, cheats)
 		if score >= 1000000000 {
@@ -133,11 +129,12 @@ func part1(start *Point, matrix [][]byte) int {
 		saving := bestWithoutCheating - score
 		if saving == 0 {
 			break
+		} else if saving >= atLeast {
+			count++
 		}
-		fmt.Println(saving, cheats)
 	}
 
-	return 0
+	return count
 }
 
 func main() {
@@ -152,5 +149,5 @@ func main() {
 	}
 
 	start, matrix := readInput(file)
-	fmt.Println("Part1:", part1(start, matrix))
+	fmt.Println("Part1:", part1(start, matrix, 100))
 }

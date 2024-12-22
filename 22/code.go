@@ -76,7 +76,6 @@ func sequenceKey(sequence []int) string {
 }
 
 func highestSum(allLastDigits [][]int, iterations int) int {
-	var allSequences [][]int
 	sums := make(map[string]int)
 	for _, lastDigits := range allLastDigits {
 		var sequence []int
@@ -97,8 +96,6 @@ func highestSum(allLastDigits [][]int, iterations int) int {
 				}
 			}
 		}
-
-		allSequences = append(allSequences, sequence)
 	}
 
 	var highest int

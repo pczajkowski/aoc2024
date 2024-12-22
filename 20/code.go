@@ -8,9 +8,8 @@ import (
 )
 
 type Point struct {
-	y, x      int
-	cost      int
-	cheatedAt *Point
+	y, x int
+	cost int
 }
 
 func (p *Point) key() string {
@@ -57,17 +56,18 @@ var directions [][]int = [][]int{
 	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
 }
 
-func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool) []Point {
+func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool) ([]Point, bool) {
 	var moves []Point
 	for _, direction := range directions {
-		move := Point{x: current.x + direction[0], y: current.y + direction[1], cost: current.cost + 1, cheatedAt: current.cheatedAt}
+		move := Point{x: current.x + direction[0], y: current.y + direction[1], cost: current.cost + 1}
 		if move.x <= 0 || move.y <= 0 || move.x >= xMax || move.y >= yMax {
 			continue
 		}
 
 		if matrix[move.y][move.x] == '#' {
-			if cheat && !cheats[move.key()] && move.cheatedAt == nil {
-				move.cheatedAt = &move
+			if cheat && !cheats[move.key()] {
+				cheat = false
+				cheats[move.key()] = true
 				moves = append(moves, move)
 			}
 
@@ -77,7 +77,7 @@ func getMoves(current Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats
 		moves = append(moves, move)
 	}
 
-	return moves
+	return moves, cheat
 }
 
 func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[string]bool, bestWithoutCheating int, savings map[int]int) int {
@@ -92,23 +92,21 @@ func hike(start *Point, matrix [][]byte, xMax, yMax int, cheat bool, cheats map[
 		if matrix[current.y][current.x] == 'E' {
 			if current.cost <= cost {
 				cost = current.cost
-				if cheat && current.cost < bestWithoutCheating {
+				if current.cost < bestWithoutCheating {
 					saving := bestWithoutCheating - current.cost
 					savings[saving]++
-
-					cheats[current.cheatedAt.key()] = true
 				}
 			}
 
 			continue
 		}
 
-		newMoves := getMoves(current, matrix, xMax, yMax, cheat, cheats)
-		for _, newMove := range newMoves {
-			if cheat && newMove.cost >= bestWithoutCheating {
-				continue
-			}
+		newMoves, cheated := getMoves(current, matrix, xMax, yMax, cheat, cheats)
+		if !cheated {
+			cheat = false
+		}
 
+		for _, newMove := range newMoves {
 			if visited[newMove.key()] == 0 || visited[newMove.key()] >= newMove.cost {
 				moves = append(moves, newMove)
 				visited[newMove.key()] = newMove.cost
@@ -126,12 +124,15 @@ func part1(start *Point, matrix [][]byte, atLeast int) int {
 	cheats := make(map[string]bool)
 	savings := make(map[int]int)
 	bestWithoutCheating := hike(start, matrix, xMax, yMax, false, cheats, 0, savings)
-	haltAt := bestWithoutCheating - atLeast
+	var prevCheats int
 	for {
-		score := hike(start, matrix, xMax, yMax, true, cheats, bestWithoutCheating, savings)
-		if score >= haltAt {
+		hike(start, matrix, xMax, yMax, true, cheats, bestWithoutCheating, savings)
+		increase := len(cheats)
+		if prevCheats == increase {
 			break
 		}
+
+		prevCheats = increase
 	}
 
 	var count int

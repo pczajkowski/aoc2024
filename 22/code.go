@@ -81,21 +81,48 @@ func isDesiredSequence(sequence, desiredSequence []int) bool {
 	return true
 }
 
-func part2(allLastDigits [][]int, iterations int, desiredSequence []int) int {
-	var result int
+func sequenceKey(sequence []int) string {
+	if len(sequence) != 4 {
+		return ""
+	}
+
+	return fmt.Sprintf("%d_%d_%d_%d", sequence[0], sequence[1], sequence[2], sequence[3])
+}
+
+func highestSum(allLastDigits [][]int, iterations int) int {
+	var allSequences [][]int
+	sums := make(map[string]int)
 	for _, lastDigits := range allLastDigits {
 		var sequence []int
+		checked := make(map[string]bool)
 		for i := 1; i < iterations; i++ {
 			sequence = append(sequence, lastDigits[i]-lastDigits[i-1])
 			if len(sequence) > 3 {
-				if isDesiredSequence(sequence[len(sequence)-4:], desiredSequence) {
-					result += lastDigits[i]
+				lastFour := sequence[len(sequence)-4:]
+				if lastFour[3] <= 0 {
+					continue
+				}
+
+				key := sequenceKey(lastFour)
+
+				if !checked[key] {
+					sums[key] += lastDigits[i]
+					checked[key] = true
 				}
 			}
 		}
+
+		allSequences = append(allSequences, sequence)
 	}
 
-	return result
+	var highest int
+	for _, value := range sums {
+		if value > highest {
+			highest = value
+		}
+	}
+
+	return highest
 }
 
 func main() {
@@ -112,5 +139,5 @@ func main() {
 	numbers := readInput(file)
 	part1Result, allLastDigits := part1(numbers, 2000)
 	fmt.Println("Part1:", part1Result)
-	fmt.Println("Part2:", part2(allLastDigits, 2001, []int{-2, 1, -1, 3}))
+	fmt.Println("Part2:", highestSum(allLastDigits, 2001))
 }

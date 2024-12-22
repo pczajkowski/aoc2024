@@ -67,33 +67,27 @@ func part1(numbers []int, iterations int) (int, [][]int) {
 	return result, allLastDigits
 }
 
-func sequenceKey(sequence []int) string {
-	if len(sequence) != 4 {
-		return ""
-	}
-
+func sequenceKey(sequence [4]int) string {
 	return fmt.Sprintf("%d_%d_%d_%d", sequence[0], sequence[1], sequence[2], sequence[3])
 }
 
 func highestSum(allLastDigits [][]int, iterations int) int {
 	sums := make(map[string]int)
 	for _, lastDigits := range allLastDigits {
-		var sequence []int
+		sequence := [4]int{lastDigits[1] - lastDigits[0], lastDigits[2] - lastDigits[1],
+			lastDigits[3] - lastDigits[2], lastDigits[4] - lastDigits[3]}
 		checked := make(map[string]bool)
-		for i := 1; i < iterations; i++ {
-			sequence = append(sequence, lastDigits[i]-lastDigits[i-1])
-			if len(sequence) > 3 {
-				lastFour := sequence[len(sequence)-4:]
-				if lastFour[3] <= 0 {
-					continue
-				}
+		for i := 5; i < iterations; i++ {
+			sequence[0], sequence[1], sequence[2] = sequence[1], sequence[2], sequence[3]
+			sequence[3] = lastDigits[i] - lastDigits[i-1]
+			if sequence[3] <= 0 {
+				continue
+			}
 
-				key := sequenceKey(lastFour)
-
-				if !checked[key] {
-					sums[key] += lastDigits[i]
-					checked[key] = true
-				}
+			key := sequenceKey(sequence)
+			if !checked[key] {
+				sums[key] += lastDigits[i]
+				checked[key] = true
 			}
 		}
 	}

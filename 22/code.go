@@ -67,20 +67,6 @@ func part1(numbers []int, iterations int) (int, [][]int) {
 	return result, allLastDigits
 }
 
-func isDesiredSequence(sequence, desiredSequence []int) bool {
-	if len(sequence) != len(desiredSequence) {
-		return false
-	}
-
-	for i := range sequence {
-		if sequence[i] != desiredSequence[i] {
-			return false
-		}
-	}
-
-	return true
-}
-
 func sequenceKey(sequence []int) string {
 	if len(sequence) != 4 {
 		return ""

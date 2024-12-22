@@ -67,14 +67,30 @@ func part1(numbers []int, iterations int) (int, [][]int) {
 	return result, allLastDigits
 }
 
-func part2(allLastDigits [][]int) int {
+func isDesiredSequence(sequence, desiredSequence []int) bool {
+	if len(sequence) != len(desiredSequence) {
+		return false
+	}
+
+	for i := range sequence {
+		if sequence[i] != desiredSequence[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func part2(allLastDigits [][]int, iterations int, desiredSequence []int) int {
 	var result int
 	for _, lastDigits := range allLastDigits {
 		var sequence []int
-		for i := 1; i < 10; i++ {
+		for i := 1; i < iterations; i++ {
 			sequence = append(sequence, lastDigits[i]-lastDigits[i-1])
 			if len(sequence) > 3 {
-				fmt.Println(sequence)
+				if isDesiredSequence(sequence[len(sequence)-4:], desiredSequence) {
+					result += lastDigits[i]
+				}
 			}
 		}
 	}
@@ -96,5 +112,5 @@ func main() {
 	numbers := readInput(file)
 	part1Result, allLastDigits := part1(numbers, 2000)
 	fmt.Println("Part1:", part1Result)
-	fmt.Println(part2(allLastDigits))
+	fmt.Println("Part2:", part2(allLastDigits, 2001, []int{-2, 1, -1, 3}))
 }

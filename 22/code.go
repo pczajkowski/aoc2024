@@ -67,6 +67,21 @@ func part1(numbers []int, iterations int) (int, [][]int) {
 	return result, allLastDigits
 }
 
+func part2(allLastDigits [][]int) int {
+	var result int
+	for _, lastDigits := range allLastDigits {
+		var sequence []int
+		for i := 1; i < 10; i++ {
+			sequence = append(sequence, lastDigits[i]-lastDigits[i-1])
+			if len(sequence) > 3 {
+				fmt.Println(sequence)
+			}
+		}
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -81,5 +96,5 @@ func main() {
 	numbers := readInput(file)
 	part1Result, allLastDigits := part1(numbers, 2000)
 	fmt.Println("Part1:", part1Result)
-	fmt.Println(allLastDigits)
+	fmt.Println(part2(allLastDigits))
 }

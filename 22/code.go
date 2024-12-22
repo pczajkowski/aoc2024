@@ -42,21 +42,29 @@ func calculate(number int) int {
 	return number
 }
 
-func generateNumber(number int, iterations int) int {
+func generateNumber(number int, iterations int) (int, []int) {
+	lastDigits := make([]int, iterations+1)
+	lastDigits[0] = number % 10
+
 	for i := 0; i < iterations; i++ {
 		number = calculate(number)
+		lastDigits[i+1] = number % 10
 	}
 
-	return number
+	return number, lastDigits
 }
 
-func part1(numbers []int, iterations int) int {
+func part1(numbers []int, iterations int) (int, [][]int) {
 	var result int
+	var allLastDigits [][]int
 	for _, number := range numbers {
-		result += generateNumber(number, iterations)
+		newNumber, lastDigits := generateNumber(number, iterations)
+		result += newNumber
+
+		allLastDigits = append(allLastDigits, lastDigits)
 	}
 
-	return result
+	return result, allLastDigits
 }
 
 func main() {
@@ -71,5 +79,7 @@ func main() {
 	}
 
 	numbers := readInput(file)
-	fmt.Println("Part1:", part1(numbers, 2000))
+	part1Result, allLastDigits := part1(numbers, 2000)
+	fmt.Println("Part1:", part1Result)
+	fmt.Println(allLastDigits)
 }

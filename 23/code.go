@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -57,6 +58,20 @@ func getSets(computers map[string][]string) [][]string {
 	return sets
 }
 
+func part1(computers map[string][]string) int {
+	sets := getSets(computers)
+	for i := range sets {
+		slices.Sort(sets[i])
+	}
+
+	unique := make(map[string]bool)
+	for i := range sets {
+		unique[strings.Join(sets[i], ",")] = true
+	}
+
+	return len(unique)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -69,5 +84,5 @@ func main() {
 	}
 
 	computers := readInput(file)
-	fmt.Println(getSets(computers))
+	fmt.Println(part1(computers))
 }

@@ -72,6 +72,56 @@ func part1(computers map[string][]string) int {
 	return len(unique)
 }
 
+func contains(nodes []string, connections map[string]bool) bool {
+	if len(connections) == 0 {
+		return true
+	}
+
+	for key, _ := range connections {
+		var isThere bool
+		for i := range nodes {
+			if nodes[i] == key {
+				isThere = true
+				break
+			}
+		}
+
+		if !isThere {
+			return false
+		}
+	}
+
+	return true
+}
+
+func connected(key string, computers map[string][]string, connections map[string]bool) {
+	if !contains(computers[key], connections) {
+		return
+	}
+
+	connections[key] = true
+	for _, value := range computers[key] {
+		if connections[value] {
+			continue
+		}
+
+		connected(value, computers, connections)
+	}
+}
+
+func part2(computers map[string][]string) int {
+	var allConnections []map[string]bool
+	for key, _ := range computers {
+		connections := make(map[string]bool)
+		connected(key, computers, connections)
+
+		allConnections = append(allConnections, connections)
+	}
+
+	fmt.Println(allConnections, len(allConnections))
+	return 0
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -84,5 +134,6 @@ func main() {
 	}
 
 	computers := readInput(file)
-	fmt.Println(part1(computers))
+	fmt.Println("Part1:", part1(computers))
+	fmt.Println("Part2:", part2(computers))
 }

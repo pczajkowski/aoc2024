@@ -30,6 +30,33 @@ func readInput(file *os.File) map[string][]string {
 	return computers
 }
 
+func getSets(computers map[string][]string) [][]string {
+	var sets [][]string
+
+	for key, value := range computers {
+		if key[0] != 't' {
+			continue
+		}
+
+		for i := range value {
+			for _, subKey := range computers[value[i]] {
+				if subKey == key {
+					continue
+				}
+
+				subValues := computers[subKey]
+				for j := range subValues {
+					if subValues[j] == key {
+						sets = append(sets, []string{key, value[i], subKey})
+					}
+				}
+			}
+		}
+	}
+
+	return sets
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -42,5 +69,5 @@ func main() {
 	}
 
 	computers := readInput(file)
-	fmt.Println(computers)
+	fmt.Println(getSets(computers))
 }

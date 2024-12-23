@@ -109,7 +109,7 @@ func connected(key string, computers map[string][]string, connections map[string
 	}
 }
 
-func part2(computers map[string][]string) int {
+func part2(computers map[string][]string) string {
 	var allConnections []map[string]bool
 	for key, _ := range computers {
 		connections := make(map[string]bool)
@@ -118,8 +118,22 @@ func part2(computers map[string][]string) int {
 		allConnections = append(allConnections, connections)
 	}
 
-	fmt.Println(allConnections, len(allConnections))
-	return 0
+	var biggest int
+	var connections map[string]bool
+	for i := range allConnections {
+		if len(allConnections[i]) > biggest {
+			biggest = len(allConnections[i])
+			connections = allConnections[i]
+		}
+	}
+
+	var keys []string
+	for key, _ := range connections {
+		keys = append(keys, key)
+	}
+
+	slices.Sort(keys)
+	return strings.Join(keys, ",")
 }
 
 func main() {

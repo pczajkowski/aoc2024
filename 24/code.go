@@ -81,6 +81,35 @@ func readInput(file *os.File) (map[string]Gate, map[string]Gate) {
 	return gates, zs
 }
 
+func calculate(gate Gate, gates map[string]Gate) int {
+	if gate.value != -1 {
+		return gate.value
+	}
+
+	left := calculate(gates[gate.left], gates)
+	right := calculate(gates[gate.right], gates)
+
+	switch gate.op {
+	case AND:
+		gate.value = left & right
+	case OR:
+		gate.value = left | right
+	case XOR:
+		gate.value = left ^ right
+	}
+
+	return gate.value
+}
+
+func calculateZs(zs, gates map[string]Gate) {
+	for key, value := range zs {
+		value.value = calculate(value, gates)
+		zs[key] = value
+	}
+
+	fmt.Println(zs)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -93,5 +122,5 @@ func main() {
 	}
 
 	gates, zs := readInput(file)
-	fmt.Println(gates, zs)
+	calculateZs(zs, gates)
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -101,13 +103,41 @@ func calculate(gate Gate, gates map[string]Gate) int {
 	return gate.value
 }
 
+func zsToNumber(zs map[string]Gate) int64 {
+	arr := make([]byte, len(zs))
+	keys := make([]string, len(zs))
+
+	var index int
+	for key, _ := range zs {
+		keys[index] = key
+		index++
+	}
+
+	slices.Sort(keys)
+	slices.Reverse(keys)
+	for i := range keys {
+		value := zs[keys[i]].value
+		switch value {
+		case 0:
+			arr[i] = '0'
+		case 1:
+			arr[i] = '1'
+		}
+	}
+
+	result, err := strconv.ParseInt(string(arr), 2, 64)
+	if err != nil {
+		log.Fatalf("Can't convert binary %s: %s", arr, err)
+	}
+
+	return result
+}
+
 func calculateZs(zs, gates map[string]Gate) {
 	for key, value := range zs {
 		value.value = calculate(value, gates)
 		zs[key] = value
 	}
-
-	fmt.Println(zs)
 }
 
 func main() {
@@ -123,4 +153,5 @@ func main() {
 
 	gates, zs := readInput(file)
 	calculateZs(zs, gates)
+	fmt.Println("Part1:", zsToNumber(zs))
 }

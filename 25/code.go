@@ -58,6 +58,27 @@ func readInput(file *os.File) ([][]int, [][]int) {
 	return locks, keys
 }
 
+func countMatches(locks, keys [][]int) int {
+	var count int
+	for _, lock := range locks {
+		for _, key := range keys {
+			fits := true
+			for i := range lock {
+				if lock[i]+key[i] > 5 {
+					fits = false
+					break
+				}
+			}
+
+			if fits {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -70,5 +91,5 @@ func main() {
 	}
 
 	locks, keys := readInput(file)
-	fmt.Println(locks, keys)
+	fmt.Println("Part1:", countMatches(locks, keys))
 }

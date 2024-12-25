@@ -37,9 +37,7 @@ func readInput(file *os.File) ([][]int, [][]int) {
 		}
 
 		if index == 0 {
-			if line[0] == '.' {
-				isKey = true
-			}
+			isKey = line[0] == '.'
 		}
 
 		if index != 0 && index != 6 {
